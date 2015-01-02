@@ -1,0 +1,3 @@
+[submodule "Tweaker"]
+	path = Tweaker
+	url = git@github.com:Ghostbit/Tweaker
