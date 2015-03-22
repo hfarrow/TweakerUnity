@@ -91,7 +91,7 @@ namespace Ghostbit.Tweaker.UI
 
 	public class TreeView
 	{
-		public ITweakerLogger logger = LogManager.Instance.GetCurrentClassLogger();
+		public ITweakerLogger logger = LogManager.GetCurrentClassLogger();
 		public Tree<BaseNode> Tree { get; private set; }
 		public Tweaker Tweaker { get; private set; }
 		private Dictionary<string, GroupNode> GroupNodes { get; set; }
@@ -145,7 +145,7 @@ namespace Ghostbit.Tweaker.UI
 
 		private TreeNode<BaseNode> EnsureGroupExists(string groupPath)
 		{
-			logger.Debug("EnsureGroupExists({0})", groupPath);
+			//logger.Trace("EnsureGroupExists({0})", groupPath);
 
 			string[] groups = groupPath.Split('.');
 			string currentGroupPath = "";
@@ -184,7 +184,7 @@ namespace Ghostbit.Tweaker.UI
 
 		private GroupNode CreateGroupNode(string fullName, string shortName, TreeNode<BaseNode> parent)
 		{
-			logger.Debug("CreateGroupNode({0}, {1}, {2})", fullName, shortName, parent);
+			logger.Trace("CreateGroupNode({0}, {1}, {2})", fullName, shortName, parent);
 
 			var newNode = new GroupNode(fullName, shortName);
 			GroupNodes.Add(fullName, newNode);
@@ -194,7 +194,7 @@ namespace Ghostbit.Tweaker.UI
 
 		private TreeNode<BaseNode> CreateTweakerNode(TreeNode<BaseNode> parent, ITweakerObject obj)
 		{
-			logger.Debug("CreateTweakerNode({0}, {1})", parent, obj.Name);
+			logger.Trace("CreateTweakerNode({0}, {1})", parent, obj.Name);
 
 			BaseNode newNode = null;
 			if (obj is IInvokable)
