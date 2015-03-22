@@ -89,14 +89,14 @@ namespace Ghostbit.Tweaker.UI
 		}
 	}
 
-	public class TreeView
+	public class TweakerTree
 	{
 		public ITweakerLogger logger = LogManager.GetCurrentClassLogger();
 		public Tree<BaseNode> Tree { get; private set; }
 		public Tweaker Tweaker { get; private set; }
 		private Dictionary<string, GroupNode> GroupNodes { get; set; }
 
-		public TreeView(Tweaker tweaker)
+		public TweakerTree(Tweaker tweaker)
 		{
 			Tweaker = tweaker;
 		}

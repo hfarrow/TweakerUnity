@@ -9,7 +9,7 @@ namespace Ghostbit.Tweaker.Console
 	{
 		private ITweakerLogger logger = LogManager.GetCurrentClassLogger();
 		private Tweaker tweaker;
-		private TreeView tree;
+		private TweakerTree tree;
 
 		void Awake()
 		{
@@ -27,7 +27,7 @@ namespace Ghostbit.Tweaker.Console
 			logger.Info("Init: " + tweaker);
 			this.tweaker = tweaker;
 
-			tree = new TreeView(tweaker);
+			tree = new TweakerTree(tweaker);
 			tree.BuildTree();
 		}
 	}
