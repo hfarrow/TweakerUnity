@@ -4,41 +4,6 @@ using UnityEngine;
 
 namespace Ghostbit.Tweaker.UI
 {
-	public class GridCell<T>
-	{
-		private T value;
-		public T Value { get { return value; } set { this.value = value; } }
-
-		public Vector3 CubeCoord { get; private set; }
-		public Vector2 AxialCoord { get; private set; }
-
-		public GridCell(Vector2 axialCoord)
-		{
-			AxialCoord = axialCoord;
-			CubeCoord = HexCoord.AxialToCube(axialCoord);
-		}
-
-		public GridCell(Vector2 axialCoord, T value)
-		{
-			AxialCoord = axialCoord;
-			CubeCoord = HexCoord.AxialToCube(axialCoord);
-			Value = value;
-		}
-	}
-
-	public static class HexCoord
-	{
-		public static Vector2 CubeToAxial(Vector3 cube)
-		{
-			return new Vector2(cube.x, cube.y);
-		}
-
-		public static Vector3 AxialToCube(Vector2 axial)
-		{
-			return new Vector3(axial.x, axial.y, -axial.x - axial.y);
-		}
-	}
-
 	public class HexGrid<TCellValue>
 	{
 		private Dictionary<string, GridCell<TCellValue>> cells;
@@ -50,38 +15,39 @@ namespace Ghostbit.Tweaker.UI
 			// TODO: build the grid (Rectangular shape to fit screen)
 		}
 
-		public GridCell<TCellValue> GetCell(Vector2 axialCoord)
+		public GridCell<TCellValue> GetCell(AxialCoord axialCoord)
 		{
 			GridCell<TCellValue> cell = null;
 			cells.TryGetValue(axialCoord.ToString(), out cell);
-			// TODO: exception on invalid cell?
 			return cell;
 		}
 
-		public GridCell<TCellValue> GetCell(Vector3 cubeCoord)
+		public GridCell<TCellValue> GetCell(CubeCoord coord)
 		{
-			return GetCell(HexCoord.CubeToAxial(cubeCoord));
+			AxialCoord axialCoord;
+			HexCoord.CubeToAxial(ref coord, out axialCoord);
+			return GetCell(axialCoord);
 		}
 
-		public TCellValue GetCellValue(Vector2 axialCoord)
+		public TCellValue GetCellValue(AxialCoord coord)
 		{
-			return GetCell(axialCoord).Value;
+			return GetCell(coord).Value;
 		}
 
-		public TCellValue GetCellValue(Vector3 cubeCoord)
+		public TCellValue GetCellValue(CubeCoord coord)
 		{
-			return GetCell(cubeCoord).Value;
+			return GetCell(coord).Value;
 		}
 
-		public void SetCellValue(TCellValue value, Vector3 cubeCoord)
+		public void SetCellValue(TCellValue value, CubeCoord coord)
 		{
-			var cell = GetCell(cubeCoord);
+			var cell = GetCell(coord);
 			cell.Value = value;
 		}
 
-		public void SetCellValue(TCellValue value, Vector2 axialCoord)
+		public void SetCellValue(TCellValue value, AxialCoord coord)
 		{
-			var cell = GetCell(axialCoord);
+			var cell = GetCell(coord);
 			cell.Value = value;
 		}
 	}
