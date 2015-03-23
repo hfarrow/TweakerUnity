@@ -37,8 +37,8 @@ namespace Ghostbit.Tweaker.UI
 			axialNeighbours = new AxialCoord[6];
 			for (var i = 0; i < 6; ++i)
 			{
-				cubeNeighbours[i] = CubeCoord + CubeCoord.DIRECTIONS[i];
-				axialNeighbours[i] = AxialCoord + AxialCoord.DIRECTIONS[i];
+				cubeNeighbours[i] = CubeCoord + CubeCoord.Directions[i];
+				axialNeighbours[i] = AxialCoord + AxialCoord.Directions[i];
 			}
 		}
 	}	

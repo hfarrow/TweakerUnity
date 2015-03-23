@@ -5,7 +5,7 @@ namespace Ghostbit.Tweaker.UI
 {
 	public struct CubeCoord
 	{
-		public static CubeCoord[] DIRECTIONS = 
+		public static CubeCoord[] Directions = 
 		{
 			new CubeCoord(1, -1, 0), new CubeCoord(1, 0, -1), new CubeCoord(0, 1, -1),
 			new CubeCoord(-1, 1, 0), new CubeCoord(-1, 0, 1), new CubeCoord(0, -1, 1)
@@ -14,13 +14,6 @@ namespace Ghostbit.Tweaker.UI
 		public int x;
 		public int y;
 		public int z;
-
-		public CubeCoord()
-		{
-			x = 0;
-			y = 0;
-			z = 0;
-		}
 
 		public CubeCoord(int x, int y, int z)
 		{
@@ -75,7 +68,7 @@ namespace Ghostbit.Tweaker.UI
 
 	public struct AxialCoord
 	{
-		public const AxialCoord[] DIRECTIONS = 
+		public static AxialCoord[] Directions = 
 		{
 			 new AxialCoord(1,0), new AxialCoord(1, -1), new AxialCoord(0, -1),
 			 new AxialCoord(-1,0), new AxialCoord(-1, 1), new AxialCoord(0, 1)
@@ -83,12 +76,6 @@ namespace Ghostbit.Tweaker.UI
 
 		public int q;
 		public int r;
-
-		public AxialCoord()
-		{
-			q = 0;
-			r = 0;
-		}
 
 		public AxialCoord(int q, int r)
 		{

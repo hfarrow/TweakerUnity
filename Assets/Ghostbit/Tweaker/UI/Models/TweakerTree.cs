@@ -122,16 +122,10 @@ namespace Ghostbit.Tweaker.UI
 			{
 				string fullName = tweakerObj.Name;
 				string groupPath = "";
-				string nodeName;
 				int indexOfNodeName = fullName.LastIndexOf('.');
-				if (indexOfNodeName < 0)
-				{
-					nodeName = fullName;
-				}
-				else
+				if (indexOfNodeName >= 0)
 				{
 					groupPath = fullName.Substring(0, indexOfNodeName);
-					nodeName = fullName.Substring(indexOfNodeName + 1);
 				}
 
 				TreeNode<BaseNode> parent = Tree.Root;

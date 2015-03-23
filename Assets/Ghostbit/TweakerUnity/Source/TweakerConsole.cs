@@ -27,7 +27,7 @@ namespace Ghostbit.Tweaker.Console
 			logger.Info("Init: " + tweaker);
 			this.tweaker = tweaker;
 
-			tree = new TweakerTree(tweaker);
+			tree = new TweakerTree(this.tweaker);
 			tree.BuildTree();
 		}
 	}

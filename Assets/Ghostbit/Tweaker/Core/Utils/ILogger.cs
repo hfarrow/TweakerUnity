@@ -89,7 +89,6 @@ namespace Ghostbit.Tweaker.Core
 
 		// Attributes copied form NLog to ensure callstack is not optimized away resulting
 		// in incorrect logger names
-		[CLSCompliant(false)]
 		[MethodImpl(MethodImplOptions.NoInlining)]
 		public static ITweakerLogger GetCurrentClassLogger()
 		{
