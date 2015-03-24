@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Ghostbit.Tweaker.UI
 {
@@ -10,6 +11,8 @@ namespace Ghostbit.Tweaker.UI
 			new CubeCoord(1, -1, 0), new CubeCoord(1, 0, -1), new CubeCoord(0, 1, -1),
 			new CubeCoord(-1, 1, 0), new CubeCoord(-1, 0, 1), new CubeCoord(0, -1, 1)
 		};
+
+		public static CubeCoord Origin = new CubeCoord(0, 0, 0);
 
 		public int x;
 		public int y;
@@ -55,6 +58,11 @@ namespace Ghostbit.Tweaker.UI
 			return (Math.Abs(x - other.x) + Math.Abs(y - other.y) + Math.Abs(z - other.z)) / 2;
 		}
 
+		public override string ToString()
+		{
+			return String.Format("({0},{1},{2})", x, y, z);
+		}
+
 		public static CubeCoord operator +(CubeCoord a, CubeCoord b)
 		{
 			return new CubeCoord(a.x + b.x, a.y + b.y, a.z + b.z);
@@ -63,6 +71,43 @@ namespace Ghostbit.Tweaker.UI
 		public static CubeCoord operator -(CubeCoord a, CubeCoord b)
 		{
 			return new CubeCoord(a.x - b.x, a.y - b.y, a.z - b.z);
+		}
+
+		public static CubeCoord operator *(CubeCoord a, CubeCoord b)
+		{
+			return new CubeCoord(a.x * b.x, a.y * b.y, a.z * b.z);
+		}
+
+		public static CubeCoord operator *(CubeCoord coord, int scalar)
+		{
+			return new CubeCoord(coord.x * scalar, coord.y * scalar, coord.z * scalar);
+		}
+
+		public static CubeCoord operator *(int scalar, CubeCoord coord)
+		{
+			return new CubeCoord(coord.x * scalar, coord.y * scalar, coord.z * scalar);
+		}
+
+		// untested but I assumed we have to round the coordinates.
+		public static CubeCoord operator /(CubeCoord a, CubeCoord b)
+		{
+			return CubeCoord.FromFraction((double)a.x / (double)b.x, 
+				(double)a.y / (double)b.y, 
+				(double)a.z / (double)b.z);
+		}
+
+		public static CubeCoord operator /(CubeCoord coord, int scalar)
+		{
+			return CubeCoord.FromFraction((double)coord.x / (double)scalar,
+				(double)coord.y / (double)scalar,
+				(double)coord.z / (double)scalar);
+		}
+
+		public static CubeCoord operator /(int scalar, CubeCoord coord)
+		{
+			return CubeCoord.FromFraction((double)coord.x / (double)scalar,
+				(double)coord.y / (double)scalar,
+				(double)coord.z / (double)scalar);
 		}
 	}
 
@@ -83,16 +128,6 @@ namespace Ghostbit.Tweaker.UI
 			this.r = r;
 		}
 
-		public static AxialCoord operator +(AxialCoord a, AxialCoord b)
-		{
-			return new AxialCoord(a.q + b.q, a.r + b.r);
-		}
-
-		public static AxialCoord operator -(AxialCoord a, AxialCoord b)
-		{
-			return new AxialCoord(a.q - b.q, a.r - b.r);
-		}
-
 		public int Distance(AxialCoord other)
 		{
 			// Convert to cube coord and use CubeCoord.Distance
@@ -101,6 +136,21 @@ namespace Ghostbit.Tweaker.UI
 			HexCoord.AxialToCube(ref this, out ac);
 			HexCoord.AxialToCube(ref other, out bc);
 			return ac.Distance(bc);
+		}
+
+		public override string ToString()
+		{
+			return String.Format("({0},{1})", q, r);
+		}
+
+		public static AxialCoord operator +(AxialCoord a, AxialCoord b)
+		{
+			return new AxialCoord(a.q + b.q, a.r + b.r);
+		}
+
+		public static AxialCoord operator -(AxialCoord a, AxialCoord b)
+		{
+			return new AxialCoord(a.q - b.q, a.r - b.r);
 		}
 	}
 
@@ -126,14 +176,27 @@ namespace Ghostbit.Tweaker.UI
 			return new CubeCoord(coord.q, -coord.q - coord.r, coord.r);
 		}
 
-		public static CubeCoord GetNeighbour(CubeCoord direction, CubeCoord cubeCoord)
+		public static Vector2 AxialToPixel(CubeCoord coord, float size)
 		{
-			return cubeCoord + direction;
+			AxialCoord axialCoord = CubeToAxial(coord);
+			return AxialToPixel(axialCoord, size);
 		}
 
-		public static AxialCoord GetNeighbour(AxialCoord direction, AxialCoord axialCoord)
+		public static Vector2 AxialToPixel(AxialCoord coord, float size)
 		{
-			return axialCoord + direction;
+			float x = size * Mathf.Sqrt(3f) * ((float)coord.q + (float)coord.r / 2f);
+			float y = size * 3f / 2f * (float)coord.r;
+			return new Vector2(x, y);
+		}
+
+		public static CubeCoord GetNeighbour(CubeCoord coord, uint direction)
+		{
+			return coord + CubeCoord.Directions[direction];
+		}
+
+		public static AxialCoord GetNeighbour(AxialCoord coord, uint direction)
+		{
+			return coord + AxialCoord.Directions[direction];
 		}
 	}
 }
