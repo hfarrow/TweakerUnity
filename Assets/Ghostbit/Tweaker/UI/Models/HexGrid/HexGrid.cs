@@ -6,9 +6,10 @@ using UnityEngine;
 namespace Ghostbit.Tweaker.UI
 {
 	public class HexGrid<TCellValue>
+		where TCellValue : class
 	{
 		private ITweakerLogger logger = LogManager.GetCurrentClassLogger();
-		private Dictionary<string, GridCell<TCellValue>> cells;
+		private Dictionary<string, HexGridCell<TCellValue>> cells;
 
 		public HexGrid(uint width, uint height)
 		{
@@ -23,14 +24,14 @@ namespace Ghostbit.Tweaker.UI
 			}
 		}
 
-		public GridCell<TCellValue> GetCell(AxialCoord axialCoord)
+		public HexGridCell<TCellValue> GetCell(AxialCoord axialCoord)
 		{
-			GridCell<TCellValue> cell = null;
+			HexGridCell<TCellValue> cell = null;
 			cells.TryGetValue(axialCoord.ToString(), out cell);
 			return cell;
 		}
 
-		public GridCell<TCellValue> GetCell(CubeCoord coord)
+		public HexGridCell<TCellValue> GetCell(CubeCoord coord)
 		{
 			AxialCoord axialCoord;
 			HexCoord.CubeToAxial(ref coord, out axialCoord);
@@ -59,10 +60,11 @@ namespace Ghostbit.Tweaker.UI
 			cell.Value = value;
 		}
 
-		public IEnumerable<GridCell<TCellValue>> GetRingCells(CubeCoord center, uint radius)
+		public IEnumerable<HexGridCell<TCellValue>> GetRingCells(CubeCoord center, uint radius)
 		{
 			logger.Trace("GetRingCells({0}, {1})", center, radius);
-			var cube = HexCoord.GetNeighbour(center, 4);
+			CubeCoord direction = CubeCoord.Directions[4] * (int)radius;
+			var cube = center + direction;
 			for (uint i = 0; i < 6; ++i)
 			{
 				for (uint j = 0; j < radius; ++j)
@@ -79,7 +81,7 @@ namespace Ghostbit.Tweaker.UI
 			}
 		}
 
-		public IEnumerable<GridCell<TCellValue>> GetSpiralCells(CubeCoord center, uint radius)
+		public IEnumerable<HexGridCell<TCellValue>> GetSpiralCells(CubeCoord center, uint radius)
 		{
 			logger.Trace("GetRingCells({0}, {1})", center, radius);
 			var centerCell = GetCell(center);

@@ -109,6 +109,32 @@ namespace Ghostbit.Tweaker.UI
 				}
 			}
 		}
+
+		// Enumerate all node (in undefined order) and return nodes that have at
+		// least one child.
+		public IEnumerable<TreeNode<TValue>> GetBranchNodes()
+		{
+			foreach(var node in TraverseBreadthFirst())
+			{
+				if(node.Children.Count > 0)
+				{
+					yield return node;
+				}
+			}
+		}
+
+		// Enumerate all node (in undefined order) and return nodes that have no
+		// children
+		public IEnumerable<TreeNode<TValue>> GetLeafNodes()
+		{
+			foreach (var node in TraverseBreadthFirst())
+			{
+				if (node.Children.Count == 0)
+				{
+					yield return node;
+				}
+			}
+		}
 	}
 
 	public class TreeNodeList<TValue> : List<TValue>

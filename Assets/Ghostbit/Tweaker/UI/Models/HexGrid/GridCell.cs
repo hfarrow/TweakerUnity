@@ -5,10 +5,11 @@ using System.Text;
 
 namespace Ghostbit.Tweaker.UI
 {
-	public class GridCell<T>
+	public class HexGridCell<TCellValue>
+		where TCellValue : class
 	{
-		private T value;
-		public T Value { get { return value; } set { this.value = value; } }
+		private TCellValue value;
+		public TCellValue Value { get { return value; } set { this.value = value; } }
 
 		public CubeCoord CubeCoord { get; private set; }
 		public AxialCoord AxialCoord { get; private set; }
@@ -16,14 +17,14 @@ namespace Ghostbit.Tweaker.UI
 		public CubeCoord[] cubeNeighbours;
 		public AxialCoord[] axialNeighbours;
 
-		public GridCell(AxialCoord axialCoord)
+		public HexGridCell(AxialCoord axialCoord)
 		{
 			AxialCoord = axialCoord;
 			CubeCoord = HexCoord.AxialToCube(axialCoord);
 			CacheNeighbourCoords();
 		}
 
-		public GridCell(AxialCoord axialCoord, T value)
+		public HexGridCell(AxialCoord axialCoord, TCellValue value)
 		{
 			AxialCoord = axialCoord;
 			CubeCoord = HexCoord.AxialToCube(axialCoord);

@@ -6,16 +6,17 @@ namespace Ghostbit.Tweaker.UI
 {
 	public static class HexGridFactory
 	{
-		public static Dictionary<string, GridCell<TCellValue>> MakeRectangleGrid<TCellValue>(uint width, uint height)
+		public static Dictionary<string, HexGridCell<TCellValue>> MakeRectangleGrid<TCellValue>(uint width, uint height)
+			where TCellValue : class
 		{
 			var logger = LogManager.GetCurrentClassLogger();
 			// array[r][q + r/2]
 
-			var cells = new Dictionary<string, GridCell<TCellValue>>();
+			var cells = new Dictionary<string, HexGridCell<TCellValue>>();
 
 			// Offsets are to make (0,0) the center of the grid because
 			// the grid is generated with (0,0) at the top left.
-			int xOffset = (int)width / 2;
+			int xOffset = (int)width / 2 - 1;
 			int yOffset = (int)height / 2;
 
 			for (int currentRow = 0; currentRow < height; currentRow++)
@@ -29,7 +30,7 @@ namespace Ghostbit.Tweaker.UI
 
 					int q = -(currentRow / 2) + currentColumn - xOffset;
 					int r = currentRow - yOffset;
-					var cell = new GridCell<TCellValue>(new AxialCoord(q, r), default(TCellValue));
+					var cell = new HexGridCell<TCellValue>(new AxialCoord(q, r), null);
 					cells.Add(cell.AxialCoord.ToString(), cell);
 					logger.Trace("Created cell at: " + cell.AxialCoord + "  (" + cell.CubeCoord + ")");
 				}
@@ -38,19 +39,22 @@ namespace Ghostbit.Tweaker.UI
 			return cells;
 		}
 
-		public static Dictionary<string, GridCell<TCellValue>> MakeHexagonGrid<TCellValue>(uint radius)
+		public static Dictionary<string, HexGridCell<TCellValue>> MakeHexagonGrid<TCellValue>(uint radius)
+			where TCellValue : class
 		{
 			// array[r + N][q + N + min(0, r)]
 			throw new NotImplementedException();
 		}
 
-		public static Dictionary<string, GridCell<TCellValue>> MakeTriangleGrid<TCellValue>(uint sideLength)
+		public static Dictionary<string, HexGridCell<TCellValue>> MakeTriangleGrid<TCellValue>(uint sideLength)
+			where TCellValue : class
 		{
 			// Half a Rhombus - if x + y > sideLength then discard cell.
 			throw new NotImplementedException();
 		}
 
-		public static Dictionary<string, GridCell<TCellValue>> MakeRhombusGrid<TCellValue>(uint sideLength)
+		public static Dictionary<string, HexGridCell<TCellValue>> MakeRhombusGrid<TCellValue>(uint sideLength)
+			where TCellValue : class
 		{
 			// array[r][q] - Simplest to implement, for(x < size){ for(y < size) { cell = (x,y) } }
 			throw new NotImplementedException();

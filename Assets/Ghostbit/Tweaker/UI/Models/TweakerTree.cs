@@ -135,6 +135,17 @@ namespace Ghostbit.Tweaker.UI
 				}
 				CreateTweakerNode(parent, tweakerObj);
 			}
+
+			SortGroupChildren();
+		}
+
+		private void SortGroupChildren()
+		{
+			logger.Debug("SortGroupChildren");
+			foreach(var node in Tree.Root.GetBranchNodes())
+			{
+				// TODO: sort the children of this node: Groups > invokables > tweakables > watchables > other
+			}
 		}
 
 		private TreeNode<BaseNode> EnsureGroupExists(string groupPath)
