@@ -8,14 +8,14 @@ namespace Ghostbit.Tweaker.Console
 {
 	public class TweakerConsole : MonoBehaviour
 	{
-		public HexTileView HexTilePrefab;
+		public TileView DefaultTilePrefab;
 		public GameObject GridPanel; 
 
 		private ITweakerLogger logger = LogManager.GetCurrentClassLogger();
 		private Tweaker tweaker;
 		private TweakerTree tree;
 		private HexGrid<BaseNode> grid;
-		private HexTileView[] orderedViews;
+		private TileView[] orderedViews;
 
 		private BaseNode currentTweakerNode;
 
@@ -43,7 +43,7 @@ namespace Ghostbit.Tweaker.Console
 			tree = new TweakerTree(this.tweaker);
 			tree.BuildTree();			
 			grid = new HexGrid<BaseNode>(GRID_WIDTH, GRID_HEIGHT);
-			orderedViews = new HexTileView[GRID_WIDTH * GRID_HEIGHT];
+			orderedViews = new TileView[GRID_WIDTH * GRID_HEIGHT];
 
 			int cellCounter = 0;
 			foreach (var cell in grid.GetSpiralCells(CubeCoord.Origin, 5))
@@ -54,9 +54,9 @@ namespace Ghostbit.Tweaker.Console
 			DisplayNode(tree.Tree.Root);
 		}
 
-		private HexTileView SetupCell(HexGridCell<BaseNode> cell)
+		private TileView SetupCell(HexGridCell<BaseNode> cell)
 		{
-			HexTileView view = Instantiate(HexTilePrefab) as HexTileView;
+			TileView view = Instantiate(DefaultTilePrefab) as TileView;
 			var viewTransform = view.GetComponent<RectTransform>();
 			viewTransform.SetParent(GridPanel.GetComponent<RectTransform>(), false);
 			view.name = cell.AxialCoord.ToString();
@@ -92,14 +92,14 @@ namespace Ghostbit.Tweaker.Console
 				currentTweakerNode = parentNode;
 
 				int numChildren = parentNode.Children.Count;
-				HexTileView rootView = orderedViews[0];
+				TileView rootView = orderedViews[0];
 				rootView.Cell.Value = parentNode;
 				ConfigureView(rootView);
 
 				for (int i = 1; i < orderedViews.Length; ++i)
 				{
-					HexTileView view = orderedViews[i];
-					var uiTransform = view.TileUI.GetComponent<RectTransform>();
+					TileView view = orderedViews[i];
+					var uiTransform = view.DefaultView.TileUI.GetComponent<RectTransform>();
 					if (i <= numChildren)
 					{
 						// Populated cells
@@ -128,14 +128,14 @@ namespace Ghostbit.Tweaker.Console
 			//		if invokable with args: show args as "tweakables"
 		}
 
-		private void ConfigureView(HexTileView view)
+		private void ConfigureView(TileView view)
 		{
 			// Reasonable Defaults
-			view.TileColor = Color.white;
-			view.TileAlpha = 1f;
-			view.NameText.color = Color.black;
-			view.XText.text = view.Cell.AxialCoord.q.ToString();
-			view.YText.text = view.Cell.AxialCoord.r.ToString();
+			view.DefaultView.TileColor = Color.white;
+			view.DefaultView.TileAlpha = 1f;
+			view.DefaultView.NameText.color = Color.black;
+			view.DefaultView.XText.text = view.Cell.AxialCoord.q.ToString();
+			view.DefaultView.YText.text = view.Cell.AxialCoord.r.ToString();
 
 			if (view.Cell.Value == null)
 			{
@@ -168,38 +168,38 @@ namespace Ghostbit.Tweaker.Console
 			}
 		}
 
-		private void ConfigureEmptyView(HexTileView view)
+		private void ConfigureEmptyView(TileView view)
 		{
-			view.TileAlpha = 0.25f;
-			view.Name = "";
-			view.FullNameView.FullNameText.text = "";
+			view.DefaultView.TileAlpha = 0.25f;
+			view.DefaultView.Name = "";
+			view.DefaultView.FullNameView.FullNameText.text = "";
 		}
 
-		private void ConfigureUnkownView(HexTileView view)
+		private void ConfigureUnkownView(TileView view)
 		{
-			view.TileAlpha = 0.6f;
-			view.Name = "<Unknown Type>";
-			view.FullNameView.FullNameText.text = "";
+			view.DefaultView.TileAlpha = 0.6f;
+			view.DefaultView.Name = "<Unknown Type>";
+			view.DefaultView.FullNameView.FullNameText.text = "";
 		}
 
-		private void ConfigureRootView(HexTileView view)
+		private void ConfigureRootView(TileView view)
 		{
 			GroupNode node = view.Cell.Value as GroupNode;
 			if (node != null)
 			{
-				view.Name = node.ShortName;
+				view.DefaultView.Name = node.ShortName;
 			}
 			else
 			{
-				view.Name = "ROOT";
-				view.FullNameView.FullNameText.text = "Root Node";
+				view.DefaultView.Name = "ROOT";
+				view.DefaultView.FullNameView.FullNameText.text = "Root Node";
 			}
 			Color newColor = new Color(.2f, .2f, .2f, 1f);
-			view.TileColor = newColor;
-			view.NameText.color = Color.white;
+			view.DefaultView.TileColor = newColor;
+			view.DefaultView.NameText.color = Color.white;
 		}
 
-		private void ConfigureGroupView(HexTileView view)
+		private void ConfigureGroupView(TileView view)
 		{
 			var node = view.Cell.Value as GroupNode;
 			if (node == currentTweakerNode)
@@ -209,39 +209,39 @@ namespace Ghostbit.Tweaker.Console
 			}
 			else
 			{
-				view.Name = node.ShortName;
-				view.TileColor = Color.white;
+				view.DefaultView.Name = node.ShortName;
+				view.DefaultView.TileColor = Color.white;
 			}
 
-			view.FullNameView.FullNameText.text = node.FullName;
+			view.DefaultView.FullNameView.FullNameText.text = node.FullName;
 		}
 
-		private void ConfigureInvokableView(HexTileView view)
+		private void ConfigureInvokableView(TileView view)
 		{
 			var node = view.Cell.Value as InvokableNode;
-			view.Name = node.Invokable.ShortName;
-			view.TileColor = Color.blue;
-			view.NameText.color = Color.white;
-			view.FullNameView.FullNameText.text = node.Invokable.Name;
+			view.DefaultView.Name = node.Invokable.ShortName;
+			view.DefaultView.TileColor = Color.blue;
+			view.DefaultView.NameText.color = Color.white;
+			view.DefaultView.FullNameView.FullNameText.text = node.Invokable.Name;
 		}
 
-		private void ConfigureTweakableView(HexTileView view)
+		private void ConfigureTweakableView(TileView view)
 		{
 			var node = view.Cell.Value as TweakableNode;
-			view.Name = node.Tweakable.ShortName;
-			view.TileColor = Color.cyan;
-			view.FullNameView.FullNameText.text = node.Tweakable.Name;
+			view.DefaultView.Name = node.Tweakable.ShortName;
+			view.DefaultView.TileColor = Color.cyan;
+			view.DefaultView.FullNameView.FullNameText.text = node.Tweakable.Name;
 		}
 
-		private void ConfigureWatchableView(HexTileView view)
+		private void ConfigureWatchableView(TileView view)
 		{
 			var node = view.Cell.Value as WatchableNode;
-			view.Name = node.Watchable.ShortName;
-			view.TileColor = Color.magenta;
-			view.FullNameView.FullNameText.text = node.Watchable.Name;
+			view.DefaultView.Name = node.Watchable.ShortName;
+			view.DefaultView.TileColor = Color.magenta;
+			view.DefaultView.FullNameView.FullNameText.text = node.Watchable.Name;
 		}
 
-		private void OnTileTapped(HexTileView view)
+		private void OnTileTapped(TileView view)
 		{
 			BaseNode baseNode = view.Cell.Value;
 			if (baseNode == null)
@@ -283,20 +283,20 @@ namespace Ghostbit.Tweaker.Console
 			}
 		}
 
-		private void OnTileSelected(HexTileView view)
+		private void OnTileSelected(TileView view)
 		{
 			if (view.Cell.Value != null)
 			{
-				view.TileUI.GetComponent<RectTransform>().localScale = selectedTileScale;
+				view.DefaultView.TileUI.GetComponent<RectTransform>().localScale = selectedTileScale;
 				view.GetComponent<RectTransform>().SetAsLastSibling();
 			}
 		}
 
-		private void OnTileDeselected(HexTileView view)
+		private void OnTileDeselected(TileView view)
 		{
 			if (view.Cell.Value != null)
 			{
-				view.TileUI.GetComponent<RectTransform>().localScale = deselectedTileScale;
+				view.DefaultView.TileUI.GetComponent<RectTransform>().localScale = deselectedTileScale;
 			}
 		}
 	}

@@ -7,17 +7,16 @@ using System;
 
 namespace Ghostbit.Tweaker.UI
 {
-	public class HexTileView : MonoBehaviour
+	public class DefaultTileView : MonoBehaviour
 	{
 		public Image TileImage;
-		public HexGridCell<BaseNode> Cell;
 		public Text NameText;
 		public GameObject TileUI;
 		public FullNameView FullNameView;
 
-		public event Action<HexTileView> Tapped;
-		public event Action<HexTileView> Selected;
-		public event Action<HexTileView> Deselected;
+		public event Action<DefaultTileView> Tapped;
+		public event Action<DefaultTileView> Selected;
+		public event Action<DefaultTileView> Deselected;
 
 		// Debug Elements
 		public Text XText;
