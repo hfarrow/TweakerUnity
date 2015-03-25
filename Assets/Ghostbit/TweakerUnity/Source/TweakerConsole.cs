@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Ghostbit.Tweaker.UI;
 using Ghostbit.Tweaker.Core;
+using System.Collections;
 
 namespace Ghostbit.Tweaker.Console
 {
@@ -17,6 +18,9 @@ namespace Ghostbit.Tweaker.Console
 		private HexTileView[] orderedViews;
 
 		private BaseNode currentTweakerNode;
+
+		private Vector3 selectedTileScale = new Vector3(1.6f, 1.6f, 1f);
+		private Vector3 deselectedTileScale = new Vector3(0.95f, 0.95f, 1f);
 
 		void Awake()
 		{
@@ -51,6 +55,9 @@ namespace Ghostbit.Tweaker.Console
 				var rectTransform = view.GetComponent<RectTransform>();
 				rectTransform.SetParent(GridPanel.GetComponent<RectTransform>(), false);
 				view.name = cell.AxialCoord.ToString();
+				view.Tapped += OnTileTapped;
+				view.Selected += OnTileSelected;
+				view.Deselected += OnTileDeselected;
 
 				float tileSize = 0.14f * (Screen.width / 2f);
 				float tileHeight = tileSize * 2f;
@@ -63,8 +70,11 @@ namespace Ghostbit.Tweaker.Console
 
 				// width and height are swapped because cell is rotated 90 degrees in order to create a pointy top cell
 				// instead of a flat top cell. (visual preference)
-				rectTransform.sizeDelta = new Vector2(tileHeight, tileWidth);
-				rectTransform.localScale = new Vector3(0.95f, 0.95f, 0.95f);
+				//var imageRectTransform = view.UIContrainer.GetComponent<RectTransform>();
+				//imageRectTransform.sizeDelta = new Vector2(tileHeight, tileWidth);
+				//imageRectTransform.localScale = deselectedTileScale;
+
+				// TODO: scale the parent and make it apply to children
 
 				view.Cell = cell;
 				orderedViews[cellCounter++] = view;
@@ -75,53 +85,65 @@ namespace Ghostbit.Tweaker.Console
 
 		private void DisplayTweakerNode(BaseNode parentNode)
 		{
+			logger.Debug("DisplayTweakerNode: {0}", parentNode.Type);
 			if(currentTweakerNode == parentNode)
 			{
 				return;
 			}
 
-			var oldNode = currentTweakerNode;
-			currentTweakerNode = parentNode;
-
-			int numChildren = parentNode.Children.Count;
-			HexTileView rootView = orderedViews[0];
-			rootView.Cell.Value = parentNode;
-			ConfigureView(rootView);
-
-			for (int i = 1; i < numChildren + 1; ++i)
+			if (parentNode.Type == BaseNode.NodeType.Group || parentNode.Type == BaseNode.NodeType.Root)
 			{
-				if (numChildren + 1 > orderedViews.Length)
+				var oldNode = currentTweakerNode;
+				currentTweakerNode = parentNode;
+
+				int numChildren = parentNode.Children.Count;
+				HexTileView rootView = orderedViews[0];
+				rootView.Cell.Value = parentNode;
+				ConfigureView(rootView);
+
+				for (int i = 1; i < orderedViews.Length; ++i)
 				{
-					logger.Error("Node has more children than there are available views.");
-					return;
+					HexTileView view = orderedViews[i];
+					if (i <= numChildren)
+					{
+						// Populated cells
+						if (i >= orderedViews.Length)
+						{
+							logger.Error("Node has more children than there are available views.");
+							return;
+						}
+
+						BaseNode childNode = parentNode.Children[i - 1];
+						view.Cell.Value = childNode;
+					}
+					else
+					{
+						// Empty cells
+						view.Cell.Value = null;
+					}
+
+					ConfigureView(view);
 				}
-
-				HexTileView view = orderedViews[i];
-				BaseNode childNode = parentNode.Children[i-1];
-				view.Cell.Value = childNode;
-				ConfigureView(view);
 			}
-
-			for(int i = numChildren + 1; i < orderedViews.Length; ++i)
-			{
-				HexTileView view = orderedViews[i];
-				view.Cell.Value = null;
-				ConfigureView(view);
-			}
+			//	else
+			//		if invokable with args: show args as "tweakables"
 		}
 
 		private void ConfigureView(HexTileView view)
 		{
+			// Reasonable Defaults
+			view.TileColor = Color.white;
+			view.TileAlpha = 1f;
+			view.NameText.color = Color.black;
+			view.XText.text = view.Cell.AxialCoord.q.ToString();
+			view.YText.text = view.Cell.AxialCoord.r.ToString();
+
 			if (view.Cell.Value == null)
 			{
 				ConfigureEmptyView(view);
 			}
 			else
 			{
-				// Reasonable Defaults
-				view.TileColor = Color.white;
-				view.TileAlpha = 1f;
-
 				BaseNode baseNode = view.Cell.Value;
 				switch(baseNode.Type)
 				{
@@ -142,10 +164,8 @@ namespace Ghostbit.Tweaker.Console
 						break;
 					default:
 						ConfigureUnkownView(view);
-						break;
-					
+						break;	
 				}
-				
 			}
 		}
 
@@ -163,7 +183,15 @@ namespace Ghostbit.Tweaker.Console
 
 		private void ConfigureRootView(HexTileView view)
 		{
-			view.Name = "ROOT";
+			GroupNode node = view.Cell.Value as GroupNode;
+			if (node != null)
+			{
+				view.Name = node.ShortName;
+			}
+			else
+			{
+				view.Name = "ROOT";
+			}
 			Color newColor = new Color(.2f, .2f, .2f, 1f);
 			view.TileColor = newColor;
 			view.NameText.color = Color.white;
@@ -172,8 +200,16 @@ namespace Ghostbit.Tweaker.Console
 		private void ConfigureGroupView(HexTileView view)
 		{
 			var node = view.Cell.Value as GroupNode;
-			view.Name = node.ShortName;
-			view.TileColor = Color.white;
+			if (node == currentTweakerNode)
+			{
+				// Treat the current node as a "root" node for display purposes.
+				ConfigureRootView(view);
+			}
+			else
+			{
+				view.Name = node.ShortName;
+				view.TileColor = Color.white;
+			}
 		}
 
 		private void ConfigureInvokableView(HexTileView view)
@@ -196,6 +232,62 @@ namespace Ghostbit.Tweaker.Console
 			var node = view.Cell.Value as WatchableNode;
 			view.Name = node.Watchable.ShortName;
 			view.TileColor = Color.magenta;
+		}
+
+		private void OnTileTapped(HexTileView view)
+		{
+			BaseNode baseNode = view.Cell.Value;
+			if (baseNode == null)
+			{
+				// Tapped an empy cell
+				return;
+			}
+
+			logger.Trace("OnTileTapped: {0}", baseNode.Type.ToString());
+			switch (baseNode.Type)
+			{
+				case BaseNode.NodeType.Root:
+					// ?
+					break;
+				case BaseNode.NodeType.Group:
+					GroupNode group = baseNode.Value as GroupNode;
+					logger.Trace("Group was tapped: {0}", group.FullName);
+					if (group == currentTweakerNode)
+					{
+						DisplayTweakerNode(group.Parent);
+					}
+					else
+					{
+						DisplayTweakerNode(group);
+					}
+					break;
+				case BaseNode.NodeType.Invokable:
+					// invoke
+					break;
+				case BaseNode.NodeType.Tweakable:
+					// edit
+					break;
+				case BaseNode.NodeType.Watchable:
+					// ?
+					break;
+				default:
+					logger.Warn("Unhandled node type tapped.");
+					break;
+			}
+		}
+
+		private void OnTileSelected(HexTileView view)
+		{
+			var transform = view.GetComponent<RectTransform>();
+			transform.localScale = selectedTileScale;
+
+			transform.SetAsLastSibling();
+		}
+
+		private void OnTileDeselected(HexTileView view)
+		{
+			var transform = view.GetComponent<RectTransform>();
+			transform.localScale = deselectedTileScale;
 		}
 	}
 }

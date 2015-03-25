@@ -142,9 +142,60 @@ namespace Ghostbit.Tweaker.UI
 		private void SortGroupChildren()
 		{
 			logger.Debug("SortGroupChildren");
+
+			// GetBranchNodes is an enumerator so we need to cache all nodes before we start
+			// moving children around.
+			List<BaseNode> branchNodes = new List<BaseNode>() { Tree.Root.Value };
 			foreach(var node in Tree.Root.GetBranchNodes())
 			{
-				// TODO: sort the children of this node: Groups > invokables > tweakables > watchables > other
+				logger.Debug("Found branchNode: {0}", node);
+				branchNodes.Add(node.Value);
+			}
+
+			foreach(var node in branchNodes)
+			{
+				// Create a list for each type of node
+				// TODO: decide on a more generic way to do this.
+				// What if the number of node types explodes?
+				// Dictionary<Type, List<Type>> or add sorting mechanism directory to Tree data structure
+				List<GroupNode> groups = new List<GroupNode>();
+				List<InvokableNode> invokables = new List<InvokableNode>();
+				List<TweakableNode> tweakables = new List<TweakableNode>();
+				List<WatchableNode> watchables = new List<WatchableNode>();
+				List<BaseNode> other = new List<BaseNode>();
+
+				foreach (var childNode in node.Children)
+				{
+					switch (childNode.Value.Type)
+					{
+						case BaseNode.NodeType.Group:
+							groups.Add(childNode.Value as GroupNode);
+							break;
+						case BaseNode.NodeType.Invokable:
+							invokables.Add(childNode.Value as InvokableNode);
+							break;
+						case BaseNode.NodeType.Tweakable:
+							tweakables.Add(childNode.Value as TweakableNode);
+							break;
+						case BaseNode.NodeType.Watchable:
+							watchables.Add(childNode.Value as WatchableNode);
+							break;
+						default:
+							other.Add(childNode.Value);
+							break;
+					}
+				}
+
+				List<BaseNode> sortedNodes = new List<BaseNode>(node.Children.Count);
+				groups.ForEach(n => sortedNodes.Add(n));
+				invokables.ForEach(n => sortedNodes.Add(n));
+				tweakables.ForEach(n => sortedNodes.Add(n));
+				watchables.ForEach(n => sortedNodes.Add(n));
+				other.ForEach(n => sortedNodes.Add(n));
+				for (int i = 0; i < node.Children.Count; ++i)
+				{
+					node.Children[i] = sortedNodes[i];
+				}
 			}
 		}
 

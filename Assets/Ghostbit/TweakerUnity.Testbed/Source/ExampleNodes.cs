@@ -5,19 +5,19 @@ using Ghostbit.Tweaker.Core;
 public class ExampleNodes
 {
 	#region Root
-	[Tweakable("String")]
+	[Tweakable("MyString")]
 	public static string root_string = "root_string_value";
 
-	[Tweakable("Boolean")]
+	[Tweakable("MyBoolean")]
 	public static bool root_bool = false;
 
-	[Tweakable("Integer")]
+	[Tweakable("MyInteger")]
 	public static int root_int = 1;
 
-	[Tweakable("Float")]
+	[Tweakable("MyFloat")]
 	public static float root_float = 1.0f;
 
-	[Invokable("Command")]
+	[Invokable("MyCommand")]
 	public static void root_command()
 	{
 		LogManager.GetCurrentClassLogger().Trace("root_command invoked");
@@ -63,6 +63,39 @@ public class ExampleNodes
 
 	[Tweakable("Dog.Toys.Placeholder6")]
 	public static string dog_toys_placeholder6 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder7")]
+	public static string dog_toys_placeholder7 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder8")]
+	public static string dog_toys_placeholder8 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder9")]
+	public static string dog_toys_placeholder9 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder10")]
+	public static string dog_toys_placeholder10 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder11")]
+	public static string dog_toys_placeholder11 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder12")]
+	public static string dog_toys_placeholder12 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder13")]
+	public static string dog_toys_placeholder13 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder14")]
+	public static string dog_toys_placeholder14 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder15")]
+	public static string dog_toys_placeholder15 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder16")]
+	public static string dog_toys_placeholder16 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder17")]
+	public static string dog_toys_placeholder17 = "placeholder";
 
 	[Invokable("Dog.Toys.PlayWithToys")]
 	public static void dog_toys_playWithToys(string toysToPlayWith)
