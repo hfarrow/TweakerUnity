@@ -19,8 +19,10 @@ namespace Ghostbit.Tweaker.Console
 
 		private BaseNode currentTweakerNode;
 
+		private const uint GRID_WIDTH = 7;
+		private const uint GRID_HEIGHT = 5;
 		private Vector3 selectedTileScale = new Vector3(1.6f, 1.6f, 1f);
-		private Vector3 deselectedTileScale = new Vector3(0.95f, 0.95f, 1f);
+		private Vector3 deselectedTileScale = new Vector3(.95f, .95f, 1f);
 
 		void Awake()
 		{
@@ -39,51 +41,44 @@ namespace Ghostbit.Tweaker.Console
 			this.tweaker = tweaker;
 
 			tree = new TweakerTree(this.tweaker);
-			tree.BuildTree();
-			
-			const uint gridWidth = 7;
-			const uint gridHeight = 5;
-			grid = new HexGrid<BaseNode>(gridWidth, gridHeight);
-			logger.Debug("grid(5x5) created");
-
-			orderedViews = new HexTileView[gridWidth * gridHeight];
+			tree.BuildTree();			
+			grid = new HexGrid<BaseNode>(GRID_WIDTH, GRID_HEIGHT);
+			orderedViews = new HexTileView[GRID_WIDTH * GRID_HEIGHT];
 
 			int cellCounter = 0;
 			foreach (var cell in grid.GetSpiralCells(CubeCoord.Origin, 5))
 			{
-				HexTileView view = Instantiate(HexTilePrefab) as HexTileView;
-				var rectTransform = view.GetComponent<RectTransform>();
-				rectTransform.SetParent(GridPanel.GetComponent<RectTransform>(), false);
-				view.name = cell.AxialCoord.ToString();
-				view.Tapped += OnTileTapped;
-				view.Selected += OnTileSelected;
-				view.Deselected += OnTileDeselected;
-
-				float tileSize = 0.14f * (Screen.width / 2f);
-				float tileHeight = tileSize * 2f;
-				float tileWidth = Mathf.Sqrt(3f) / 2f * tileHeight;
-
-				Vector2 position = HexCoord.AxialToPixel(cell.AxialCoord, tileSize);
-				//logger.Debug("tile position = {0}  ({1},{2})  d={3}", cell.AxialCoord, position.x, position.y, position.magnitude);
-
-				rectTransform.anchoredPosition = position;
-
-				// width and height are swapped because cell is rotated 90 degrees in order to create a pointy top cell
-				// instead of a flat top cell. (visual preference)
-				//var imageRectTransform = view.UIContrainer.GetComponent<RectTransform>();
-				//imageRectTransform.sizeDelta = new Vector2(tileHeight, tileWidth);
-				//imageRectTransform.localScale = deselectedTileScale;
-
-				// TODO: scale the parent and make it apply to children
-
-				view.Cell = cell;
-				orderedViews[cellCounter++] = view;
+				orderedViews[cellCounter++] = SetupCell(cell);
 			}
 
-			DisplayTweakerNode(tree.Tree.Root);
+			DisplayNode(tree.Tree.Root);
 		}
 
-		private void DisplayTweakerNode(BaseNode parentNode)
+		private HexTileView SetupCell(HexGridCell<BaseNode> cell)
+		{
+			HexTileView view = Instantiate(HexTilePrefab) as HexTileView;
+			var viewTransform = view.GetComponent<RectTransform>();
+			viewTransform.SetParent(GridPanel.GetComponent<RectTransform>(), false);
+			view.name = cell.AxialCoord.ToString();
+			view.Tapped += OnTileTapped;
+			view.Selected += OnTileSelected;
+			view.Deselected += OnTileDeselected;
+
+			float tileSize = 0.18f * (Screen.width / 2f);
+			float tileHeight = tileSize * 2f;
+			float tileWidth = Mathf.Sqrt(3f) / 2f * tileHeight;
+
+			Vector2 position = HexCoord.AxialToPixel(cell.AxialCoord, tileSize);
+			//logger.Debug("tile position = {0}  ({1},{2})  d={3}", cell.AxialCoord, position.x, position.y, position.magnitude);
+
+			viewTransform.anchoredPosition = position;
+			viewTransform.sizeDelta = new Vector2(tileWidth, tileHeight);
+			view.Cell = cell;
+
+			return view;
+		}
+
+		private void DisplayNode(BaseNode parentNode)
 		{
 			logger.Debug("DisplayTweakerNode: {0}", parentNode.Type);
 			if(currentTweakerNode == parentNode)
@@ -104,6 +99,7 @@ namespace Ghostbit.Tweaker.Console
 				for (int i = 1; i < orderedViews.Length; ++i)
 				{
 					HexTileView view = orderedViews[i];
+					var uiTransform = view.TileUI.GetComponent<RectTransform>();
 					if (i <= numChildren)
 					{
 						// Populated cells
@@ -115,11 +111,14 @@ namespace Ghostbit.Tweaker.Console
 
 						BaseNode childNode = parentNode.Children[i - 1];
 						view.Cell.Value = childNode;
+						uiTransform.localScale = deselectedTileScale;
+						view.gameObject.SetActive(true);
 					}
 					else
 					{
 						// Empty cells
 						view.Cell.Value = null;
+						view.gameObject.SetActive(false);
 					}
 
 					ConfigureView(view);
@@ -173,12 +172,14 @@ namespace Ghostbit.Tweaker.Console
 		{
 			view.TileAlpha = 0.25f;
 			view.Name = "";
+			view.FullNameView.FullNameText.text = "";
 		}
 
 		private void ConfigureUnkownView(HexTileView view)
 		{
 			view.TileAlpha = 0.6f;
 			view.Name = "<Unknown Type>";
+			view.FullNameView.FullNameText.text = "";
 		}
 
 		private void ConfigureRootView(HexTileView view)
@@ -191,6 +192,7 @@ namespace Ghostbit.Tweaker.Console
 			else
 			{
 				view.Name = "ROOT";
+				view.FullNameView.FullNameText.text = "Root Node";
 			}
 			Color newColor = new Color(.2f, .2f, .2f, 1f);
 			view.TileColor = newColor;
@@ -210,6 +212,8 @@ namespace Ghostbit.Tweaker.Console
 				view.Name = node.ShortName;
 				view.TileColor = Color.white;
 			}
+
+			view.FullNameView.FullNameText.text = node.FullName;
 		}
 
 		private void ConfigureInvokableView(HexTileView view)
@@ -218,6 +222,7 @@ namespace Ghostbit.Tweaker.Console
 			view.Name = node.Invokable.ShortName;
 			view.TileColor = Color.blue;
 			view.NameText.color = Color.white;
+			view.FullNameView.FullNameText.text = node.Invokable.Name;
 		}
 
 		private void ConfigureTweakableView(HexTileView view)
@@ -225,6 +230,7 @@ namespace Ghostbit.Tweaker.Console
 			var node = view.Cell.Value as TweakableNode;
 			view.Name = node.Tweakable.ShortName;
 			view.TileColor = Color.cyan;
+			view.FullNameView.FullNameText.text = node.Tweakable.Name;
 		}
 
 		private void ConfigureWatchableView(HexTileView view)
@@ -232,6 +238,7 @@ namespace Ghostbit.Tweaker.Console
 			var node = view.Cell.Value as WatchableNode;
 			view.Name = node.Watchable.ShortName;
 			view.TileColor = Color.magenta;
+			view.FullNameView.FullNameText.text = node.Watchable.Name;
 		}
 
 		private void OnTileTapped(HexTileView view)
@@ -254,11 +261,11 @@ namespace Ghostbit.Tweaker.Console
 					logger.Trace("Group was tapped: {0}", group.FullName);
 					if (group == currentTweakerNode)
 					{
-						DisplayTweakerNode(group.Parent);
+						DisplayNode(group.Parent);
 					}
 					else
 					{
-						DisplayTweakerNode(group);
+						DisplayNode(group);
 					}
 					break;
 				case BaseNode.NodeType.Invokable:
@@ -278,16 +285,19 @@ namespace Ghostbit.Tweaker.Console
 
 		private void OnTileSelected(HexTileView view)
 		{
-			var transform = view.GetComponent<RectTransform>();
-			transform.localScale = selectedTileScale;
-
-			transform.SetAsLastSibling();
+			if (view.Cell.Value != null)
+			{
+				view.TileUI.GetComponent<RectTransform>().localScale = selectedTileScale;
+				view.GetComponent<RectTransform>().SetAsLastSibling();
+			}
 		}
 
 		private void OnTileDeselected(HexTileView view)
 		{
-			var transform = view.GetComponent<RectTransform>();
-			transform.localScale = deselectedTileScale;
+			if (view.Cell.Value != null)
+			{
+				view.TileUI.GetComponent<RectTransform>().localScale = deselectedTileScale;
+			}
 		}
 	}
 }

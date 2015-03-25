@@ -12,7 +12,8 @@ namespace Ghostbit.Tweaker.UI
 		public Image TileImage;
 		public HexGridCell<BaseNode> Cell;
 		public Text NameText;
-		public GameObject UIContrainer;
+		public GameObject TileUI;
+		public FullNameView FullNameView;
 
 		public event Action<HexTileView> Tapped;
 		public event Action<HexTileView> Selected;
@@ -21,6 +22,11 @@ namespace Ghostbit.Tweaker.UI
 		// Debug Elements
 		public Text XText;
 		public Text YText;
+
+		public void Start()
+		{
+			ShowFullNameView(false);
+		}
 
 		public Color TileColor
 		{
@@ -57,6 +63,7 @@ namespace Ghostbit.Tweaker.UI
 		{
 			if (Selected != null)
 			{
+				ShowFullNameView(true);
 				Selected(this);
 			}
 		}
@@ -65,8 +72,15 @@ namespace Ghostbit.Tweaker.UI
 		{
 			if (Deselected != null)
 			{
+				ShowFullNameView(false);
 				Deselected(this);
 			}
+		}
+
+		private void ShowFullNameView(bool show)
+		{
+			FullNameView.gameObject.SetActive(show);
+			NameText.gameObject.SetActive(!show);
 		}
 	}
 }
