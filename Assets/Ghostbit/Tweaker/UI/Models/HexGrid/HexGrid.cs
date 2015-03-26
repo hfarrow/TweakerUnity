@@ -70,7 +70,7 @@ namespace Ghostbit.Tweaker.UI
 				for (uint j = 0; j < radius; ++j)
 				{
 					var cell = GetCell(cube);
-					logger.Trace("yeild '{0}' @ '{1}' for {2},{3}", cell != null ? cell.AxialCoord.ToString() : "null", cube, i, j);
+					//logger.Trace("yeild '{0}' @ '{1}' for {2},{3}", cell != null ? cell.AxialCoord.ToString() : "null", cube, i, j);
 					if( cell != null)
 					{
 						yield return cell;

@@ -17,7 +17,7 @@ public class ExampleNodes
 	[Tweakable("MyFloat")]
 	public static float root_float = 1.0f;
 
-	[Invokable("MyCommand")]
+	[Invokable("RoomsCheats.Something.MyCommand")]
 	public static void root_command()
 	{
 		LogManager.GetCurrentClassLogger().Trace("root_command invoked");

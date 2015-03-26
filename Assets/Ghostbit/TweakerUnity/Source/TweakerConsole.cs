@@ -3,19 +3,37 @@ using System.Collections.Generic;
 using Ghostbit.Tweaker.UI;
 using Ghostbit.Tweaker.Core;
 using System.Collections;
+using System;
 
 namespace Ghostbit.Tweaker.Console
 {
 	public class TweakerConsole : MonoBehaviour
 	{
-		public TileView DefaultTilePrefab;
+		private class CellViewPair
+		{
+			public HexGridCell<BaseNode> cell;
+			public TileView view;
+			public readonly uint index;
+
+			public CellViewPair(HexGridCell<BaseNode> cell, TileView view, uint index)
+			{
+				this.cell = cell;
+				this.view = view;
+				this.index = index;
+			}
+		}
+
+		public TileView DefaultTileViewPrefab;
+		public TweakableTileView TweakableTileViewPrefab;
+		public Dictionary<Type, Component> tilePrefabMap;
+
 		public GameObject GridPanel; 
 
 		private ITweakerLogger logger = LogManager.GetCurrentClassLogger();
 		private Tweaker tweaker;
 		private TweakerTree tree;
 		private HexGrid<BaseNode> grid;
-		private TileView[] orderedViews;
+		private CellViewPair[] orderedTiles;
 
 		private BaseNode currentTweakerNode;
 
@@ -26,7 +44,14 @@ namespace Ghostbit.Tweaker.Console
 
 		void Awake()
 		{
-			
+			tilePrefabMap = new Dictionary<Type, Component>()
+			{
+				{ typeof(RootNode), DefaultTileViewPrefab },
+				{ typeof(GroupNode), DefaultTileViewPrefab },
+				{ typeof(TweakableNode), TweakableTileViewPrefab },
+				{ typeof(InvokableNode), DefaultTileViewPrefab },
+				{ typeof(WatchableNode), DefaultTileViewPrefab }
+			};
 		}
 
 		// Use this for initialization
@@ -43,39 +68,16 @@ namespace Ghostbit.Tweaker.Console
 			tree = new TweakerTree(this.tweaker);
 			tree.BuildTree();			
 			grid = new HexGrid<BaseNode>(GRID_WIDTH, GRID_HEIGHT);
-			orderedViews = new TileView[GRID_WIDTH * GRID_HEIGHT];
+			orderedTiles = new CellViewPair[GRID_WIDTH * GRID_HEIGHT];
 
-			int cellCounter = 0;
+			uint cellCounter = 0;
 			foreach (var cell in grid.GetSpiralCells(CubeCoord.Origin, 5))
 			{
-				orderedViews[cellCounter++] = SetupCell(cell);
+				orderedTiles[cellCounter] = new CellViewPair(cell, null, cellCounter);
+				++cellCounter;
 			}
 
 			DisplayNode(tree.Tree.Root);
-		}
-
-		private TileView SetupCell(HexGridCell<BaseNode> cell)
-		{
-			TileView view = Instantiate(DefaultTilePrefab) as TileView;
-			var viewTransform = view.GetComponent<RectTransform>();
-			viewTransform.SetParent(GridPanel.GetComponent<RectTransform>(), false);
-			view.name = cell.AxialCoord.ToString();
-			view.Tapped += OnTileTapped;
-			view.Selected += OnTileSelected;
-			view.Deselected += OnTileDeselected;
-
-			float tileSize = 0.18f * (Screen.width / 2f);
-			float tileHeight = tileSize * 2f;
-			float tileWidth = Mathf.Sqrt(3f) / 2f * tileHeight;
-
-			Vector2 position = HexCoord.AxialToPixel(cell.AxialCoord, tileSize);
-			//logger.Debug("tile position = {0}  ({1},{2})  d={3}", cell.AxialCoord, position.x, position.y, position.magnitude);
-
-			viewTransform.anchoredPosition = position;
-			viewTransform.sizeDelta = new Vector2(tileWidth, tileHeight);
-			view.Cell = cell;
-
-			return view;
 		}
 
 		private void DisplayNode(BaseNode parentNode)
@@ -88,162 +90,233 @@ namespace Ghostbit.Tweaker.Console
 
 			if (parentNode.Type == BaseNode.NodeType.Group || parentNode.Type == BaseNode.NodeType.Root)
 			{
-				var oldNode = currentTweakerNode;
+				BaseNode oldNode = currentTweakerNode;
 				currentTweakerNode = parentNode;
 
 				int numChildren = parentNode.Children.Count;
-				TileView rootView = orderedViews[0];
-				rootView.Cell.Value = parentNode;
-				ConfigureView(rootView);
 
-				for (int i = 1; i < orderedViews.Length; ++i)
+				CellViewPair rootPair = orderedTiles[0];
+				rootPair.cell.Value = parentNode;
+
+				if (rootPair.view == null || oldNode.GetType() != parentNode.GetType())
 				{
-					TileView view = orderedViews[i];
-					var uiTransform = view.DefaultView.TileUI.GetComponent<RectTransform>();
+					SetupTileView(rootPair);
+				}
+
+				TileView rootView = rootPair.view;
+				ConfigureView(rootPair);
+
+				for (int i = 1; i < orderedTiles.Length; ++i)
+				{
+					CellViewPair pair = orderedTiles[i];
+					logger.Trace("Prepare next tile: cell={0} view={1} index={2}", pair.cell, pair.view, pair.index);
+
 					if (i <= numChildren)
 					{
 						// Populated cells
-						if (i >= orderedViews.Length)
+						if (i >= orderedTiles.Length)
 						{
 							logger.Error("Node has more children than there are available views.");
 							return;
 						}
 
 						BaseNode childNode = parentNode.Children[i - 1];
-						view.Cell.Value = childNode;
-						uiTransform.localScale = deselectedTileScale;
+						pair.cell.Value = childNode;
+						if (pair.view == null || pair.cell.Value.GetType() != childNode.GetType())
+						{
+							SetupTileView(pair);
+						}
+
+						TileView view = pair.view;
+						view.Scale = deselectedTileScale;
 						view.gameObject.SetActive(true);
+						ConfigureView(pair);
 					}
 					else
 					{
-						// Empty cells
-						view.Cell.Value = null;
-						view.gameObject.SetActive(false);
+						if (pair.view != null)
+						{
+							Destroy(pair.view.gameObject);
+							pair.view = null;
+						}
 					}
-
-					ConfigureView(view);
 				}
 			}
 			//	else
 			//		if invokable with args: show args as "tweakables"
 		}
 
-		private void ConfigureView(TileView view)
+		private void SetupTileView(CellViewPair pair)
 		{
-			// Reasonable Defaults
-			view.DefaultView.TileColor = Color.white;
-			view.DefaultView.TileAlpha = 1f;
-			view.DefaultView.NameText.color = Color.black;
-			view.DefaultView.XText.text = view.Cell.AxialCoord.q.ToString();
-			view.DefaultView.YText.text = view.Cell.AxialCoord.r.ToString();
-
-			if (view.Cell.Value == null)
+			logger.Trace("SetupTileView: cell={0}, view={1}, index={2}", pair.cell, pair.view, pair.index);
+			if (pair.view != null)
 			{
-				ConfigureEmptyView(view);
+				Destroy(pair.view.gameObject);
+				pair.view = null;
+			}
+			
+			if (pair.cell == null)
+			{
+				logger.Error("A cell instance must be provided for index {0}", pair.index);
+				return;
+			}
+
+			logger.Trace("pair.cell.Value = {0}", pair.cell.Value);
+
+			HexGridCell<BaseNode> cell = pair.cell;
+			Component viewPrefab;
+			logger.Trace("cell.Value={0}", cell.Value);
+			if (!tilePrefabMap.TryGetValue(cell.Value.GetType(), out viewPrefab))
+			{
+				logger.Error("Could not find a prefab mapping for type '{0}'.", cell.Value.GetType().FullName);
+				viewPrefab = DefaultTileViewPrefab;
+			}
+
+			TileView view = Instantiate(viewPrefab) as TileView;
+			if (view == null)
+			{
+				logger.Error("Failed to Instantiate view prefab <{0}> as TileView", viewPrefab);
+				return;
+			}
+
+			pair.view = view;
+			var viewTransform = view.GetComponent<RectTransform>();
+			viewTransform.SetParent(GridPanel.GetComponent<RectTransform>(), false);
+			view.name = cell.AxialCoord.ToString();
+			view.Tapped += (TileView v) => { OnTileTapped(v, cell); };
+			view.Selected += (TileView v) => { OnTileSelected(v, cell); };
+			view.Deselected += (TileView v) => { OnTileDeselected(v, cell); };
+
+			float tileSize = 0.09f * Screen.width;
+			float tileHeight = tileSize * 2f;
+			float tileWidth = Mathf.Sqrt(3f) / 2f * tileHeight;
+
+			Vector2 position = HexCoord.AxialToPixel(cell.AxialCoord, tileSize);
+			//logger.Debug("tile position = {0}  ({1},{2})  d={3}", cell.AxialCoord, position.x, position.y, position.magnitude);
+
+			viewTransform.anchoredPosition = position;
+			viewTransform.sizeDelta = new Vector2(tileWidth, tileHeight);
+		}
+
+		private void ConfigureView(CellViewPair pair)
+		{
+			TileView view = pair.view;
+			BaseNode node = pair.cell.Value;
+
+			logger.Trace("ConfigureView: node={0} view={1} index={2}", node, view, pair.index);
+
+			// Reasonable Defaults
+			view.TileColor = Color.white;
+			view.TileAlpha = 1f;
+			view.NameText.color = Color.black;
+
+			if (node.Value == null)
+			{
+				ConfigureEmptyView(view, node);
 			}
 			else
 			{
-				BaseNode baseNode = view.Cell.Value;
+				BaseNode baseNode = node.Value;
 				switch(baseNode.Type)
 				{
 					case BaseNode.NodeType.Root:
-						ConfigureRootView(view);
+						ConfigureRootView(view, node);
 						break;
 					case BaseNode.NodeType.Group:
-						ConfigureGroupView(view);
+						ConfigureGroupView(view, node as GroupNode);
 						break;
 					case BaseNode.NodeType.Invokable:
-						ConfigureInvokableView(view);
+						ConfigureInvokableView(view, node as InvokableNode);
 						break;
 					case BaseNode.NodeType.Tweakable:
-						ConfigureTweakableView(view);
+						ConfigureTweakableView(view, node as TweakableNode);
 						break;
 					case BaseNode.NodeType.Watchable:
-						ConfigureWatchableView(view);
+						ConfigureWatchableView(view, node as WatchableNode);
 						break;
 					default:
-						ConfigureUnkownView(view);
+						ConfigureUnkownView(view, node);
 						break;	
 				}
 			}
 		}
 
-		private void ConfigureEmptyView(TileView view)
+		private void ConfigureEmptyView(TileView view, BaseNode node)
 		{
-			view.DefaultView.TileAlpha = 0.25f;
-			view.DefaultView.Name = "";
-			view.DefaultView.FullNameView.FullNameText.text = "";
+			view.TileAlpha = 0.25f;
+			view.Name = "";
+			view.FullName = "";
 		}
 
-		private void ConfigureUnkownView(TileView view)
+		private void ConfigureUnkownView(TileView view, BaseNode node)
 		{
-			view.DefaultView.TileAlpha = 0.6f;
-			view.DefaultView.Name = "<Unknown Type>";
-			view.DefaultView.FullNameView.FullNameText.text = "";
+			view.TileAlpha = 0.6f;
+			view.Name = "<Unknown Type>";
+			view.FullName = "";
 		}
 
-		private void ConfigureRootView(TileView view)
+		private void ConfigureRootView(TileView view, BaseNode node)
 		{
-			GroupNode node = view.Cell.Value as GroupNode;
-			if (node != null)
+			logger.Trace("ConfigureRootView: view={0}<{1}> node={2}", view, view.GetType().FullName, node);
+			GroupNode groupNode = node as GroupNode;
+			if (groupNode != null)
 			{
-				view.DefaultView.Name = node.ShortName;
+				view.Name = groupNode.ShortName;
 			}
 			else
 			{
-				view.DefaultView.Name = "ROOT";
-				view.DefaultView.FullNameView.FullNameText.text = "Root Node";
+				view.Name = "ROOT";
+				view.FullName = "Root Node";
 			}
 			Color newColor = new Color(.2f, .2f, .2f, 1f);
-			view.DefaultView.TileColor = newColor;
-			view.DefaultView.NameText.color = Color.white;
+			view.TileColor = newColor;
+			view.NameText.color = Color.white;
 		}
 
-		private void ConfigureGroupView(TileView view)
+		private void ConfigureGroupView(TileView view, GroupNode node)
 		{
-			var node = view.Cell.Value as GroupNode;
 			if (node == currentTweakerNode)
 			{
 				// Treat the current node as a "root" node for display purposes.
-				ConfigureRootView(view);
+				ConfigureRootView(view, node);
 			}
 			else
 			{
-				view.DefaultView.Name = node.ShortName;
-				view.DefaultView.TileColor = Color.white;
+				view.Name = node.ShortName;
+				view.TileColor = Color.white;
 			}
 
-			view.DefaultView.FullNameView.FullNameText.text = node.FullName;
+			view.FullName = node.FullName;
 		}
 
-		private void ConfigureInvokableView(TileView view)
+		private void ConfigureInvokableView(TileView view, InvokableNode node)
 		{
-			var node = view.Cell.Value as InvokableNode;
-			view.DefaultView.Name = node.Invokable.ShortName;
-			view.DefaultView.TileColor = Color.blue;
-			view.DefaultView.NameText.color = Color.white;
-			view.DefaultView.FullNameView.FullNameText.text = node.Invokable.Name;
+			view.Name = node.Invokable.ShortName;
+			view.TileColor = Color.blue;
+			view.NameText.color = Color.white;
+			view.FullName = node.Invokable.Name;
 		}
 
-		private void ConfigureTweakableView(TileView view)
+		private void ConfigureTweakableView(TileView view, TweakableNode node)
 		{
-			var node = view.Cell.Value as TweakableNode;
-			view.DefaultView.Name = node.Tweakable.ShortName;
-			view.DefaultView.TileColor = Color.cyan;
-			view.DefaultView.FullNameView.FullNameText.text = node.Tweakable.Name;
+			view.Name = node.Tweakable.ShortName;
+			view.TileColor = Color.cyan;
+			view.FullName = node.Tweakable.Name;
+
+			var tweakableView = view as TweakableTileView;
+			tweakableView.Value = node.Tweakable.GetValue().ToString();
 		}
 
-		private void ConfigureWatchableView(TileView view)
+		private void ConfigureWatchableView(TileView view, WatchableNode node)
 		{
-			var node = view.Cell.Value as WatchableNode;
-			view.DefaultView.Name = node.Watchable.ShortName;
-			view.DefaultView.TileColor = Color.magenta;
-			view.DefaultView.FullNameView.FullNameText.text = node.Watchable.Name;
+			view.Name = node.Watchable.ShortName;
+			view.TileColor = Color.magenta;
+			view.FullName = node.Watchable.Name;
 		}
 
-		private void OnTileTapped(TileView view)
+		private void OnTileTapped(TileView view, HexGridCell<BaseNode> node)
 		{
-			BaseNode baseNode = view.Cell.Value;
+			BaseNode baseNode = node.Value;
 			if (baseNode == null)
 			{
 				// Tapped an empy cell
@@ -283,20 +356,21 @@ namespace Ghostbit.Tweaker.Console
 			}
 		}
 
-		private void OnTileSelected(TileView view)
+		private void OnTileSelected(TileView view, HexGridCell<BaseNode> cell)
 		{
-			if (view.Cell.Value != null)
+			logger.Trace("OnTileSelected: cell.Value={0}", cell.Value);
+			if (cell.Value != null)
 			{
-				view.DefaultView.TileUI.GetComponent<RectTransform>().localScale = selectedTileScale;
+				view.Scale = selectedTileScale;
 				view.GetComponent<RectTransform>().SetAsLastSibling();
 			}
 		}
 
-		private void OnTileDeselected(TileView view)
+		private void OnTileDeselected(TileView view, HexGridCell<BaseNode> cell)
 		{
-			if (view.Cell.Value != null)
+			if (cell.Value != null)
 			{
-				view.DefaultView.TileUI.GetComponent<RectTransform>().localScale = deselectedTileScale;
+				view.Scale = deselectedTileScale;
 			}
 		}
 	}
