@@ -5,27 +5,18 @@ using Ghostbit.Tweaker.Core;
 using System.Collections;
 using System;
 
-namespace Ghostbit.Tweaker.Console
+namespace Ghostbit.Tweaker.UI
 {
-	public class TweakerConsole : MonoBehaviour
+	public interface ITweakerConsole
 	{
-		private class CellViewPair
-		{
-			public HexGridCell<BaseNode> cell;
-			public TileView view;
-			public readonly uint index;
+		BaseNode CurrentNode { get; }
+		void DisplayNode(BaseNode nodeToDisplay);
+	}
 
-			public CellViewPair(HexGridCell<BaseNode> cell, TileView view, uint index)
-			{
-				this.cell = cell;
-				this.view = view;
-				this.index = index;
-			}
-		}
-
+	public class TweakerConsole : MonoBehaviour, ITweakerConsole
+	{
 		public TileView DefaultTileViewPrefab;
 		public TweakableTileView TweakableTileViewPrefab;
-		public Dictionary<Type, Component> tilePrefabMap;
 
 		public GameObject GridPanel; 
 
@@ -33,18 +24,19 @@ namespace Ghostbit.Tweaker.Console
 		private Tweaker tweaker;
 		private TweakerTree tree;
 		private HexGrid<BaseNode> grid;
-		private CellViewPair[] orderedTiles;
+		private ITileController[] orderedControllers;
+		private HexGridCell<BaseNode>[] orderedCells;
+		private Dictionary<Type, TileView> tilePrefabMap;
+		private TileViewFactory tileViewFactory;
 
-		private BaseNode currentTweakerNode;
+		public BaseNode CurrentNode { get; private set; }
 
 		private const uint GRID_WIDTH = 7;
 		private const uint GRID_HEIGHT = 5;
-		private Vector3 selectedTileScale = new Vector3(1.6f, 1.6f, 1f);
-		private Vector3 deselectedTileScale = new Vector3(.95f, .95f, 1f);
 
 		void Awake()
 		{
-			tilePrefabMap = new Dictionary<Type, Component>()
+			tilePrefabMap = new Dictionary<Type, TileView>()
 			{
 				{ typeof(RootNode), DefaultTileViewPrefab },
 				{ typeof(GroupNode), DefaultTileViewPrefab },
@@ -52,12 +44,14 @@ namespace Ghostbit.Tweaker.Console
 				{ typeof(InvokableNode), DefaultTileViewPrefab },
 				{ typeof(WatchableNode), DefaultTileViewPrefab }
 			};
+			tileViewFactory = new TileViewFactory(tilePrefabMap, 
+				DefaultTileViewPrefab, Instantiate, GridPanel.GetComponent<RectTransform>());
 		}
 
 		// Use this for initialization
 		void Start()
 		{
-
+			
 		}
 
 		public void Init(Tweaker tweaker)
@@ -68,76 +62,131 @@ namespace Ghostbit.Tweaker.Console
 			tree = new TweakerTree(this.tweaker);
 			tree.BuildTree();			
 			grid = new HexGrid<BaseNode>(GRID_WIDTH, GRID_HEIGHT);
-			orderedTiles = new CellViewPair[GRID_WIDTH * GRID_HEIGHT];
+			orderedControllers = new ITileController[GRID_WIDTH * GRID_HEIGHT];
+			orderedCells = new HexGridCell<BaseNode>[GRID_WIDTH * GRID_HEIGHT];
 
 			uint cellCounter = 0;
 			foreach (var cell in grid.GetSpiralCells(CubeCoord.Origin, 5))
 			{
-				orderedTiles[cellCounter] = new CellViewPair(cell, null, cellCounter);
-				++cellCounter;
+				orderedCells[cellCounter++] = cell;
 			}
 
 			DisplayNode(tree.Tree.Root);
 		}
 
-		private void DisplayNode(BaseNode parentNode)
+		public void DisplayNode(BaseNode nodeToDisplay)
 		{
-			logger.Debug("DisplayTweakerNode: {0}", parentNode.Type);
-			if(currentTweakerNode == parentNode)
+			logger.Debug("DisplayTweakerNode: {0}", nodeToDisplay.Type);
+			if(CurrentNode == nodeToDisplay)
 			{
 				return;
 			}
 
-			if (parentNode.Type == BaseNode.NodeType.Group || parentNode.Type == BaseNode.NodeType.Root)
+			if (nodeToDisplay.Type == BaseNode.NodeType.Group || nodeToDisplay.Type == BaseNode.NodeType.Root)
 			{
-				BaseNode oldNode = currentTweakerNode;
-				currentTweakerNode = parentNode;
+				//BaseNode oldNode = CurrentNode;
+				CurrentNode = nodeToDisplay;
 
-				int numChildren = parentNode.Children.Count;
+				int numChildren = nodeToDisplay.Children.Count;
 
-				CellViewPair rootPair = orderedTiles[0];
-				rootPair.cell.Value = parentNode;
-
-				if (rootPair.view == null || oldNode.GetType() != parentNode.GetType())
+				HexGridCell<BaseNode> rootCell = orderedCells[0];
+				rootCell.Value = nodeToDisplay;
+				ITileController rootController = orderedControllers[0];
+				TileView rootView;
+				TileView rootViewPrefab;
+				tilePrefabMap.TryGetValue(nodeToDisplay.GetType(), out rootViewPrefab);
+				// Check to see if we need to create a new view or if the previous view
+				// is this cell can be reused.
+				if (rootController == null ||
+					rootViewPrefab.GetType() != rootController.ViewType)
 				{
-					SetupTileView(rootPair);
+					// FIXME: destroy views and controllers at correct times.
+					if (rootController != null)
+					{
+						Destroy(rootController.BaseView);
+					}
+					rootView = GetTileView(rootCell);
+				}
+				else if (rootController != null)
+				{
+					rootView = rootController.BaseView;
+				}
+				else
+				{
+					rootView = null;
+					logger.Error("Failed to create a new tile view or recycle the previous view for this cell.");
+					return;
 				}
 
-				TileView rootView = rootPair.view;
-				ConfigureView(rootPair);
-
-				for (int i = 1; i < orderedTiles.Length; ++i)
+				if(rootController != null)
 				{
-					CellViewPair pair = orderedTiles[i];
-					logger.Trace("Prepare next tile: cell={0} view={1} index={2}", pair.cell, pair.view, pair.index);
+					rootController.Dispose();
+					orderedControllers[0] = null;
+				}
+				rootController = TileControllerFactory.MakeController(rootView, rootCell, this);
+				orderedControllers[0] = rootController;
+
+				ConfigureView(rootController);
+
+				for (int i = 1; i < orderedCells.Length; ++i)
+				{
+					HexGridCell<BaseNode> childCell = orderedCells[i];
+					ITileController childController = orderedControllers[i];
 
 					if (i <= numChildren)
 					{
 						// Populated cells
-						if (i >= orderedTiles.Length)
+						if (i >= orderedCells.Length)
 						{
 							logger.Error("Node has more children than there are available views.");
 							return;
 						}
 
-						BaseNode childNode = parentNode.Children[i - 1];
-						pair.cell.Value = childNode;
-						if (pair.view == null || pair.cell.Value.GetType() != childNode.GetType())
+						BaseNode newChildNode = nodeToDisplay.Children[i - 1];
+						childCell.Value = newChildNode;
+						
+						TileView childView;
+						TileView childViewPrefab;
+						tilePrefabMap.TryGetValue(newChildNode.GetType(), out childViewPrefab);
+						// Check to see if we need to create a new view or if the previous view
+						// is this cell can be reused.
+						if (childController == null ||
+							childViewPrefab.GetType() != childController.ViewType)
 						{
-							SetupTileView(pair);
+							if (childController != null)
+							{
+								Destroy(childController.BaseView);
+							}
+							childView = GetTileView(childCell);
+						}
+						else if (childController != null)
+						{
+							childView = childController.BaseView;
+						}
+						else
+						{
+							childView = null;
+							logger.Error("Failed to create a new tile view or recycle the previous view for this cell.");
+							return;
 						}
 
-						TileView view = pair.view;
-						view.Scale = deselectedTileScale;
-						view.gameObject.SetActive(true);
-						ConfigureView(pair);
+						if (childController != null)
+						{
+							childController.Dispose();
+							orderedControllers[i] = null;
+						}
+						childController = TileControllerFactory.MakeController(childView, childCell, this);
+						orderedControllers[i] = childController;
+
+						ConfigureView(childController);
 					}
 					else
 					{
-						if (pair.view != null)
+						if (childController != null)
 						{
-							Destroy(pair.view.gameObject);
-							pair.view = null;
+							Destroy(childController.BaseView.gameObject);
+							childController.Dispose();
+							orderedControllers[i] = null;
 						}
 					}
 				}
@@ -146,64 +195,25 @@ namespace Ghostbit.Tweaker.Console
 			//		if invokable with args: show args as "tweakables"
 		}
 
-		private void SetupTileView(CellViewPair pair)
+		private TileView GetTileView(HexGridCell<BaseNode> cell)
 		{
-			logger.Trace("SetupTileView: cell={0}, view={1}, index={2}", pair.cell, pair.view, pair.index);
-			if (pair.view != null)
-			{
-				Destroy(pair.view.gameObject);
-				pair.view = null;
-			}
+			logger.Trace("SetupTileView: cell={0}", cell);
 			
-			if (pair.cell == null)
+			if (cell == null || cell.Value == null)
 			{
-				logger.Error("A cell instance must be provided for index {0}", pair.index);
-				return;
-			}
+				logger.Error("A cell instance must be provided for cell: {0}", cell);
+				return null;
+			}			
 
-			logger.Trace("pair.cell.Value = {0}", pair.cell.Value);
-
-			HexGridCell<BaseNode> cell = pair.cell;
-			Component viewPrefab;
-			logger.Trace("cell.Value={0}", cell.Value);
-			if (!tilePrefabMap.TryGetValue(cell.Value.GetType(), out viewPrefab))
-			{
-				logger.Error("Could not find a prefab mapping for type '{0}'.", cell.Value.GetType().FullName);
-				viewPrefab = DefaultTileViewPrefab;
-			}
-
-			TileView view = Instantiate(viewPrefab) as TileView;
-			if (view == null)
-			{
-				logger.Error("Failed to Instantiate view prefab <{0}> as TileView", viewPrefab);
-				return;
-			}
-
-			pair.view = view;
-			var viewTransform = view.GetComponent<RectTransform>();
-			viewTransform.SetParent(GridPanel.GetComponent<RectTransform>(), false);
-			view.name = cell.AxialCoord.ToString();
-			view.Tapped += (TileView v) => { OnTileTapped(v, cell); };
-			view.Selected += (TileView v) => { OnTileSelected(v, cell); };
-			view.Deselected += (TileView v) => { OnTileDeselected(v, cell); };
-
-			float tileSize = 0.09f * Screen.width;
-			float tileHeight = tileSize * 2f;
-			float tileWidth = Mathf.Sqrt(3f) / 2f * tileHeight;
-
-			Vector2 position = HexCoord.AxialToPixel(cell.AxialCoord, tileSize);
-			//logger.Debug("tile position = {0}  ({1},{2})  d={3}", cell.AxialCoord, position.x, position.y, position.magnitude);
-
-			viewTransform.anchoredPosition = position;
-			viewTransform.sizeDelta = new Vector2(tileWidth, tileHeight);
+			return tileViewFactory.MakeView<TileView>(cell);
 		}
 
-		private void ConfigureView(CellViewPair pair)
+		private void ConfigureView(ITileController controller)
 		{
-			TileView view = pair.view;
-			BaseNode node = pair.cell.Value;
+			TileView view = controller.BaseView;
+			BaseNode node = controller.BaseNode;
 
-			logger.Trace("ConfigureView: node={0} view={1} index={2}", node, view, pair.index);
+			logger.Trace("ConfigureView: node={0} view={1}", node, view);
 
 			// Reasonable Defaults
 			view.TileColor = Color.white;
@@ -258,12 +268,11 @@ namespace Ghostbit.Tweaker.Console
 		private void ConfigureRootView(TileView view, BaseNode node)
 		{
 			logger.Trace("ConfigureRootView: view={0}<{1}> node={2}", view, view.GetType().FullName, node);
-			GroupNode groupNode = node as GroupNode;
-			if (groupNode != null)
-			{
-				view.Name = groupNode.ShortName;
-			}
-			else
+
+			// For convenience, sometimes node will be a group node so check what type
+			// it is first.
+			// TODO: get rit of "RootNode" and make it a group named "Root"
+			if(node is RootNode)
 			{
 				view.Name = "ROOT";
 				view.FullName = "Root Node";
@@ -275,10 +284,11 @@ namespace Ghostbit.Tweaker.Console
 
 		private void ConfigureGroupView(TileView view, GroupNode node)
 		{
-			if (node == currentTweakerNode)
+			if (node == CurrentNode)
 			{
 				// Treat the current node as a "root" node for display purposes.
 				ConfigureRootView(view, node);
+				view.Name = node.ShortName;
 			}
 			else
 			{
@@ -312,66 +322,6 @@ namespace Ghostbit.Tweaker.Console
 			view.Name = node.Watchable.ShortName;
 			view.TileColor = Color.magenta;
 			view.FullName = node.Watchable.Name;
-		}
-
-		private void OnTileTapped(TileView view, HexGridCell<BaseNode> node)
-		{
-			BaseNode baseNode = node.Value;
-			if (baseNode == null)
-			{
-				// Tapped an empy cell
-				return;
-			}
-
-			logger.Trace("OnTileTapped: {0}", baseNode.Type.ToString());
-			switch (baseNode.Type)
-			{
-				case BaseNode.NodeType.Root:
-					// ?
-					break;
-				case BaseNode.NodeType.Group:
-					GroupNode group = baseNode.Value as GroupNode;
-					logger.Trace("Group was tapped: {0}", group.FullName);
-					if (group == currentTweakerNode)
-					{
-						DisplayNode(group.Parent);
-					}
-					else
-					{
-						DisplayNode(group);
-					}
-					break;
-				case BaseNode.NodeType.Invokable:
-					// invoke
-					break;
-				case BaseNode.NodeType.Tweakable:
-					// edit
-					break;
-				case BaseNode.NodeType.Watchable:
-					// ?
-					break;
-				default:
-					logger.Warn("Unhandled node type tapped.");
-					break;
-			}
-		}
-
-		private void OnTileSelected(TileView view, HexGridCell<BaseNode> cell)
-		{
-			logger.Trace("OnTileSelected: cell.Value={0}", cell.Value);
-			if (cell.Value != null)
-			{
-				view.Scale = selectedTileScale;
-				view.GetComponent<RectTransform>().SetAsLastSibling();
-			}
-		}
-
-		private void OnTileDeselected(TileView view, HexGridCell<BaseNode> cell)
-		{
-			if (cell.Value != null)
-			{
-				view.Scale = deselectedTileScale;
-			}
 		}
 	}
 }

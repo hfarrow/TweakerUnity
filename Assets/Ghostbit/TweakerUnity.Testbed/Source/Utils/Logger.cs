@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Ghostbit.Tweaker.Core;
 
-namespace Ghostbit.Tweaker.Console.Testbed
+namespace Ghostbit.Tweaker.UI.Testbed
 {
 	public class LogManager : ITweakerLogManager
 	{

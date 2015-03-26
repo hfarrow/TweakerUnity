@@ -6,7 +6,7 @@ public class ExampleNodes
 {
 	#region Root
 	[Tweakable("MyString")]
-	public static string root_string = "root_string_value";
+	public static string root_string = "root string value";
 
 	[Tweakable("MyBoolean")]
 	public static bool root_bool = false;
@@ -17,7 +17,7 @@ public class ExampleNodes
 	[Tweakable("MyFloat")]
 	public static float root_float = 1.0f;
 
-	[Invokable("RoomsCheats.Something.MyCommand")]
+	[Invokable("MyCommand")]
 	public static void root_command()
 	{
 		LogManager.GetCurrentClassLogger().Trace("root_command invoked");
@@ -115,6 +115,9 @@ public class ExampleNodes
 	[Tweakable("Cat.Size")]
 	public static int cat_size = 2;
 	#endregion // Group Cat
+
+	[Tweakable("TestGroup.Really.Really.Really.Long.Group.TestValue")]
+	public static int test_value = 99999;
 
 	#endregion // Root
 }

@@ -6,7 +6,7 @@ using CoreLogManager = Ghostbit.Tweaker.Core.LogManager;
 using Ghostbit.Tweaker.AssemblyScanner;
 using System.Reflection;
 
-namespace Ghostbit.Tweaker.Console.Testbed
+namespace Ghostbit.Tweaker.UI.Testbed
 {
 	public class TweakerConsoleTestbed : MonoBehaviour
 	{
