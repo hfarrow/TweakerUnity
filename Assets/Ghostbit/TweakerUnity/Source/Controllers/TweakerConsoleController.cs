@@ -17,9 +17,14 @@ namespace Ghostbit.Tweaker.UI
 
 	public class TweakerConsoleController : MonoBehaviour, ITweakerConsoleController
 	{
-		private ITweakerLogger logger = LogManager.GetCurrentClassLogger();
+		public InspectorView InspectorViewPrefab;
+		public HexGridController GridController;
+
 		public Tweaker Tweaker { get; private set; }
 		public TweakerTree Tree { get; private set; }
+
+		private InspectorController inspector;
+		private ITweakerLogger logger = LogManager.GetCurrentClassLogger();
 
 		// Must be called from awake of another script
 		public void Init(Tweaker tweaker)
@@ -33,7 +38,23 @@ namespace Ghostbit.Tweaker.UI
 
 		public void ShowInspector(BaseNode nodeToInspect)
 		{
-			throw new NotImplementedException();
+			if(inspector == null)
+			{
+				CreateInspector();
+			}
+		}
+
+		private void CreateInspector()
+		{
+			InspectorView view = Instantiate(InspectorViewPrefab) as InspectorView;
+			view.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>(), false);
+			inspector = new InspectorController(view, GridController);
+			inspector.Closed += InspectorClosed;
+		}
+
+		private void InspectorClosed()
+		{
+			inspector = null;
 		}
 	}
 }

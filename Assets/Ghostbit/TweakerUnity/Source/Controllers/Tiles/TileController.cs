@@ -34,11 +34,11 @@ namespace Ghostbit.Tweaker.UI
 		public TNode Node { get; private set; }
 
 		protected ITweakerLogger logger = LogManager.GetCurrentClassLogger();
-		protected IHexGridController console;
+		protected IHexGridController grid;
 
-		public TileController(IHexGridController console, TView view, HexGridCell<BaseNode> cell)
+		public TileController(IHexGridController grid, TView view, HexGridCell<BaseNode> cell)
 		{
-			this.console = console;
+			this.grid = grid;
 			View = view;
 			BaseCell = cell;
 			Node = BaseCell.Value as TNode;

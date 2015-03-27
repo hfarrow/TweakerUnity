@@ -28,7 +28,7 @@ namespace Ghostbit.Tweaker.UI
 
 		protected override void ViewTapped(TileView view)
 		{
-			
+			grid.Console.ShowInspector(Node);
 		}
 	}
 }

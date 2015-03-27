@@ -7,6 +7,7 @@ namespace Ghostbit.Tweaker.UI
 {
 	public interface IHexGridController
 	{
+		ITweakerConsoleController Console { get; }
 		BaseNode CurrentDisplayNode { get; }
 		BaseNode CurrentInspectorNode { get; }
 
@@ -18,8 +19,9 @@ namespace Ghostbit.Tweaker.UI
 		public TileView DefaultTileViewPrefab;
 		public TweakableTileView TweakableTileViewPrefab;
 		public GameObject GridPanel;
-		public TweakerConsoleController Console;
+		public TweakerConsoleController ConsoleController;
 
+		public ITweakerConsoleController Console { get { return ConsoleController; } }
 		public BaseNode CurrentDisplayNode { get; private set; }
 		public BaseNode CurrentInspectorNode { get; private set; }
 
@@ -50,7 +52,7 @@ namespace Ghostbit.Tweaker.UI
 
 		public void Start()
 		{
-			Tree = Console.Tree.Tree;
+			Tree = ConsoleController.Tree.Tree;
 			grid = new HexGrid<BaseNode>(GRID_WIDTH, GRID_HEIGHT);
 			orderedControllers = new ITileController[GRID_WIDTH * GRID_HEIGHT];
 			orderedCells = new HexGridCell<BaseNode>[GRID_WIDTH * GRID_HEIGHT];

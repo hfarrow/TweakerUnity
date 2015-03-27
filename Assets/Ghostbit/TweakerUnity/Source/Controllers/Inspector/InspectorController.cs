@@ -8,21 +8,22 @@ namespace Ghostbit.Tweaker.UI
 	public class InspectorController
 	{
 		private InspectorView view;
-		private IHexGridController console;
+		private IHexGridController gridController;
 		private ITweakerLogger logger = LogManager.GetCurrentClassLogger();
 
 		public event Action Closed;
 
-		public InspectorController(InspectorView view, IHexGridController console)
+		public InspectorController(InspectorView view, IHexGridController gridController)
 		{
 			this.view = view;
-			this.console = console;
+			this.gridController = gridController;
 			ConfigureViews();
 		}
 
 		public void Destroy()
 		{
 			view.Background.DoneButton.onClick.RemoveAllListeners();
+			view.DestroySelf();
 		}
 
 		private void ConfigureViews()

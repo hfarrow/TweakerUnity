@@ -20,7 +20,7 @@ namespace Ghostbit.Tweaker.UI
 			View.TileColor = Color.white;
 			View.FullName = Node.FullName;
 
-			if (Node == console.CurrentDisplayNode)
+			if (Node == grid.CurrentDisplayNode)
 			{
 				View.TileColor = new Color(.2f, .2f, .2f);
 				View.NameText.color = Color.white;
@@ -30,16 +30,16 @@ namespace Ghostbit.Tweaker.UI
 		protected override void ViewTapped(TileView view)
 		{
 			logger.Trace("Group was tapped: {0}", Node.FullName);
-			if (Node == console.CurrentDisplayNode)
+			if (Node == grid.CurrentDisplayNode)
 			{
 				if (Node.Parent != null)
 				{
-					console.DisplayNode(Node.Parent);
+					grid.DisplayNode(Node.Parent);
 				}
 			}
 			else
 			{
-				console.DisplayNode(Node);
+				grid.DisplayNode(Node);
 			}
 		}
 	}
