@@ -33,6 +33,13 @@ namespace Ghostbit.Tweaker.UI
 			}
 		}
 
+		public void OnDestroy()
+		{
+			Tapped = null;
+			Selected = null;
+			Deselected = null;
+		}
+
 		public void OnTapped()
 		{
 			if (Tapped != null)

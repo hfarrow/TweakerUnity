@@ -13,20 +13,16 @@ namespace Ghostbit.Tweaker.UI
 			ITileController controller;
 			switch (cell.Value.Type)
 			{
-				case BaseNode.NodeType.Root:
-					controller = new TileController<TileView, RootNode>(console, view, cell);
-					break;
-
 				case BaseNode.NodeType.Group:
-					controller = new TileController<TileView, GroupNode>(console, view, cell);
+					controller = new GroupTileController(console, view, cell);
 					break;
 
 				case BaseNode.NodeType.Invokable:
-					controller = new TileController<TileView, InvokableNode>(console, view, cell);
+					controller = new InvokableTileController(console, view, cell);
 					break;
 
 				case BaseNode.NodeType.Tweakable:
-					controller = new TileController<TileView, TweakableNode>(console, view, cell);
+					controller = new TweakableTileController(console, view as TweakableTileView, cell);
 					break;
 
 				case BaseNode.NodeType.Watchable:
@@ -43,6 +39,7 @@ namespace Ghostbit.Tweaker.UI
 					break;
 			}
 
+			controller.Init();
 			return controller;
 		}
 	}

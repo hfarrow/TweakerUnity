@@ -4,6 +4,7 @@ using Ghostbit.Tweaker.UI;
 using Ghostbit.Tweaker.Core;
 using System.Collections;
 using System;
+using UnityEngine.UI;
 
 namespace Ghostbit.Tweaker.UI
 {
@@ -38,7 +39,6 @@ namespace Ghostbit.Tweaker.UI
 		{
 			tilePrefabMap = new Dictionary<Type, TileView>()
 			{
-				{ typeof(RootNode), DefaultTileViewPrefab },
 				{ typeof(GroupNode), DefaultTileViewPrefab },
 				{ typeof(TweakableNode), TweakableTileViewPrefab },
 				{ typeof(InvokableNode), DefaultTileViewPrefab },
@@ -77,127 +77,103 @@ namespace Ghostbit.Tweaker.UI
 		public void DisplayNode(BaseNode nodeToDisplay)
 		{
 			logger.Debug("DisplayTweakerNode: {0}", nodeToDisplay.Type);
-			if(CurrentNode == nodeToDisplay)
+			if (CurrentNode == nodeToDisplay)
 			{
 				return;
 			}
 
-			if (nodeToDisplay.Type == BaseNode.NodeType.Group || nodeToDisplay.Type == BaseNode.NodeType.Root)
+			if (nodeToDisplay.Type == BaseNode.NodeType.Group)
 			{
-				//BaseNode oldNode = CurrentNode;
+				// BaseNode oldNode = CurrentNode;
 				CurrentNode = nodeToDisplay;
-
 				int numChildren = nodeToDisplay.Children.Count;
+				List<BaseNode> displayList = new List<BaseNode>(numChildren + 1);
 
-				HexGridCell<BaseNode> rootCell = orderedCells[0];
-				rootCell.Value = nodeToDisplay;
-				ITileController rootController = orderedControllers[0];
-				TileView rootView;
-				TileView rootViewPrefab;
-				tilePrefabMap.TryGetValue(nodeToDisplay.GetType(), out rootViewPrefab);
-				// Check to see if we need to create a new view or if the previous view
-				// is this cell can be reused.
-				if (rootController == null ||
-					rootViewPrefab.GetType() != rootController.ViewType)
+				displayList.Add(nodeToDisplay);
+				displayList.AddRange(nodeToDisplay.Children);
+
+				// First let's destroy controllers that will no longer be needed.
+				// (Fewer views than available cells.
+				for (uint orderedIndex = (uint)displayList.Count; orderedIndex < orderedControllers.Length; ++orderedIndex)
 				{
-					// FIXME: destroy views and controllers at correct times.
-					if (rootController != null)
+					ITileController controller = orderedControllers[orderedIndex];
+					if (controller != null)
 					{
-						Destroy(rootController.BaseView);
+						DestroyController(orderedIndex, true);
 					}
-					rootView = GetTileView(rootCell);
-				}
-				else if (rootController != null)
-				{
-					rootView = rootController.BaseView;
-				}
-				else
-				{
-					rootView = null;
-					logger.Error("Failed to create a new tile view or recycle the previous view for this cell.");
-					return;
 				}
 
-				if(rootController != null)
+				for (uint orderedIndex = 0; orderedIndex < displayList.Count; ++orderedIndex)
 				{
-					rootController.Dispose();
-					orderedControllers[0] = null;
-				}
-				rootController = TileControllerFactory.MakeController(rootView, rootCell, this);
-				orderedControllers[0] = rootController;
+					BaseNode node = displayList[(int)orderedIndex];
+					HexGridCell<BaseNode> cell = orderedCells[orderedIndex];
+					cell.Value = node;
+					ITileController controller = orderedControllers[orderedIndex];
 
-				ConfigureView(rootController);
+					//logger.Trace("Setup next tile: node={0}, cell={1}, controller={2}", node, cell, controller);
 
-				for (int i = 1; i < orderedCells.Length; ++i)
-				{
-					HexGridCell<BaseNode> childCell = orderedCells[i];
-					ITileController childController = orderedControllers[i];
-
-					if (i <= numChildren)
+					TileView viewPrefab;
+					TileView view = null;
+					if(!tilePrefabMap.TryGetValue(node.GetType(), out viewPrefab))
 					{
-						// Populated cells
-						if (i >= orderedCells.Length)
-						{
-							logger.Error("Node has more children than there are available views.");
-							return;
-						}
+						logger.Error("No tile view prefab mapping exists for type {0}.", node.GetType());
+						DestroyController(orderedIndex, true);
+						continue;
+					}
 
-						BaseNode newChildNode = nodeToDisplay.Children[i - 1];
-						childCell.Value = newChildNode;
-						
-						TileView childView;
-						TileView childViewPrefab;
-						tilePrefabMap.TryGetValue(newChildNode.GetType(), out childViewPrefab);
-						// Check to see if we need to create a new view or if the previous view
-						// is this cell can be reused.
-						if (childController == null ||
-							childViewPrefab.GetType() != childController.ViewType)
+					// Is there an existing controller and view that we can re-use? 
+					// (Does the old view type match the new view type?)
+					if (controller != null)
+					{
+						if (controller.ViewType != viewPrefab.GetType())
 						{
-							if (childController != null)
-							{
-								Destroy(childController.BaseView);
-							}
-							childView = GetTileView(childCell);
-						}
-						else if (childController != null)
-						{
-							childView = childController.BaseView;
+							DestroyController(orderedIndex, true);
 						}
 						else
 						{
-							childView = null;
-							logger.Error("Failed to create a new tile view or recycle the previous view for this cell.");
-							return;
+							view = controller.BaseView;
+							view.Name = view.Name + "+";
 						}
-
-						if (childController != null)
-						{
-							childController.Dispose();
-							orderedControllers[i] = null;
-						}
-						childController = TileControllerFactory.MakeController(childView, childCell, this);
-						orderedControllers[i] = childController;
-
-						ConfigureView(childController);
 					}
-					else
+
+					// Existing view could not be re-used or there was no existing view/controller
+					if (view == null)
 					{
-						if (childController != null)
+						logger.Trace("Get new tile!");
+						view = GetTileView(cell);
+						if (view == null)
 						{
-							Destroy(childController.BaseView.gameObject);
-							childController.Dispose();
-							orderedControllers[i] = null;
+							logger.Error("Failed to get a tile view for node of type {0}", node.Type);
+							continue;
 						}
 					}
+
+					// Always recreate the controller.
+					// Note: it is possible to recycle controllers as well but it isn't very expensive 
+					// to always create a new controller instance.
+					// Note: Destroy the old controller if it was not already destroyed above but do
+					// not allow the view that may be getting re-used to be destroyed
+					DestroyController(orderedIndex, false);
+					controller = TileControllerFactory.MakeController(view, cell, this);
+					orderedControllers[orderedIndex] = controller;
+					ConfigureView(controller);
 				}
 			}
-			//	else
-			//		if invokable with args: show args as "tweakables"
+		}
+
+		private void DestroyController(uint orderedIndex, bool destroyView)
+		{
+			ITileController controller = orderedControllers[orderedIndex];
+			if (controller != null)
+			{
+				controller.Destroy(destroyView);
+				orderedControllers[orderedIndex] = null;
+			}
 		}
 
 		private TileView GetTileView(HexGridCell<BaseNode> cell)
 		{
-			logger.Trace("SetupTileView: cell={0}", cell);
+			logger.Trace("GetTileView: cell={0}", cell);
 			
 			if (cell == null || cell.Value == null)
 			{
@@ -216,9 +192,9 @@ namespace Ghostbit.Tweaker.UI
 			logger.Trace("ConfigureView: node={0} view={1}", node, view);
 
 			// Reasonable Defaults
-			view.TileColor = Color.white;
-			view.TileAlpha = 1f;
-			view.NameText.color = Color.black;
+			//view.TileColor = Color.white;
+			//view.TileAlpha = 1f;
+			//view.NameText.color = Color.black;
 
 			if (node.Value == null)
 			{
@@ -229,23 +205,12 @@ namespace Ghostbit.Tweaker.UI
 				BaseNode baseNode = node.Value;
 				switch(baseNode.Type)
 				{
-					case BaseNode.NodeType.Root:
-						ConfigureRootView(view, node);
-						break;
-					case BaseNode.NodeType.Group:
-						ConfigureGroupView(view, node as GroupNode);
-						break;
-					case BaseNode.NodeType.Invokable:
-						ConfigureInvokableView(view, node as InvokableNode);
-						break;
-					case BaseNode.NodeType.Tweakable:
-						ConfigureTweakableView(view, node as TweakableNode);
-						break;
 					case BaseNode.NodeType.Watchable:
 						ConfigureWatchableView(view, node as WatchableNode);
 						break;
 					default:
-						ConfigureUnkownView(view, node);
+						
+						//ConfigureUnkownView(view, node);
 						break;	
 				}
 			}
@@ -263,58 +228,6 @@ namespace Ghostbit.Tweaker.UI
 			view.TileAlpha = 0.6f;
 			view.Name = "<Unknown Type>";
 			view.FullName = "";
-		}
-
-		private void ConfigureRootView(TileView view, BaseNode node)
-		{
-			logger.Trace("ConfigureRootView: view={0}<{1}> node={2}", view, view.GetType().FullName, node);
-
-			// For convenience, sometimes node will be a group node so check what type
-			// it is first.
-			// TODO: get rit of "RootNode" and make it a group named "Root"
-			if(node is RootNode)
-			{
-				view.Name = "ROOT";
-				view.FullName = "Root Node";
-			}
-			Color newColor = new Color(.2f, .2f, .2f, 1f);
-			view.TileColor = newColor;
-			view.NameText.color = Color.white;
-		}
-
-		private void ConfigureGroupView(TileView view, GroupNode node)
-		{
-			if (node == CurrentNode)
-			{
-				// Treat the current node as a "root" node for display purposes.
-				ConfigureRootView(view, node);
-				view.Name = node.ShortName;
-			}
-			else
-			{
-				view.Name = node.ShortName;
-				view.TileColor = Color.white;
-			}
-
-			view.FullName = node.FullName;
-		}
-
-		private void ConfigureInvokableView(TileView view, InvokableNode node)
-		{
-			view.Name = node.Invokable.ShortName;
-			view.TileColor = Color.blue;
-			view.NameText.color = Color.white;
-			view.FullName = node.Invokable.Name;
-		}
-
-		private void ConfigureTweakableView(TileView view, TweakableNode node)
-		{
-			view.Name = node.Tweakable.ShortName;
-			view.TileColor = Color.cyan;
-			view.FullName = node.Tweakable.Name;
-
-			var tweakableView = view as TweakableTileView;
-			tweakableView.Value = node.Tweakable.GetValue().ToString();
 		}
 
 		private void ConfigureWatchableView(TileView view, WatchableNode node)

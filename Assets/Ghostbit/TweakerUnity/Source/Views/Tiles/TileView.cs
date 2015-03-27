@@ -106,6 +106,11 @@ namespace Ghostbit.Tweaker.UI
 			
 		}
 
+		public void DestroySelf()
+		{
+			Destroy(gameObject);
+		}
+
 		private void InstatiatePrefabs()
 		{
 			background = InstantiateTileComponent(BackgroundPrefab);

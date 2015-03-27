@@ -11,7 +11,6 @@ namespace Ghostbit.Tweaker.UI
 		public enum NodeType
 		{
 			Unknown,
-			Root,
 			Group,
 			Invokable,
 			Tweakable,
@@ -26,20 +25,6 @@ namespace Ghostbit.Tweaker.UI
 			{
 				throw new Exception("NodeType must be overriden in parent and must not be Unknown.");
 			}
-		}
-	}
-
-	public class RootNode : BaseNode
-	{
-		public RootNode()
-		{
-		}
-
-		public override NodeType Type { get { return NodeType.Root; } }
-
-		public void Init()
-		{
-
 		}
 	}
 
@@ -105,7 +90,7 @@ namespace Ghostbit.Tweaker.UI
 		{
 			logger.Debug("BuildTree({0})", searchOptions);
 
-			Tree = new Tree<BaseNode>(new RootNode());
+			Tree = new Tree<BaseNode>(new GroupNode("Root", "Root"));
 			GroupNodes = new Dictionary<string, GroupNode>();
 
 			var invokables = Tweaker.Invokables.GetInvokables(searchOptions);

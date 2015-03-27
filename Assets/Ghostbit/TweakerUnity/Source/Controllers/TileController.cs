@@ -5,21 +5,24 @@ using UnityEngine;
 
 namespace Ghostbit.Tweaker.UI
 {
-	public interface ITileController : IDisposable
+	public interface ITileController
 	{
 		Type ViewType { get; }
 		BaseNode.NodeType NodeType { get; }
 		TileView BaseView { get; }
 		BaseNode BaseNode { get; }
 		HexGridCell<BaseNode> BaseCell { get; }
+
+		void Init();
+		void Destroy(bool destroyView);
 	}
 
 	public class TileController<TView, TNode> : ITileController
 		where TView : TileView
 		where TNode : BaseNode
 	{
-		private static Vector3 selectedTileScale = new Vector3(1.6f, 1.6f, 1f);
-		private static Vector3 deselectedTileScale = new Vector3(.95f, .95f, 1f);
+		protected static Vector3 selectedTileScale = new Vector3(1.6f, 1.6f, 1f);
+		protected static Vector3 deselectedTileScale = new Vector3(.95f, .95f, 1f);
 
 		public Type ViewType { get { return typeof(TView); } }
 		public BaseNode.NodeType NodeType { get { return Node.Type; } }
@@ -30,8 +33,8 @@ namespace Ghostbit.Tweaker.UI
 		public TView View { get; private set; }
 		public TNode Node { get; private set; }
 
-		private ITweakerLogger logger = LogManager.GetCurrentClassLogger();
-		private ITweakerConsole console;
+		protected ITweakerLogger logger = LogManager.GetCurrentClassLogger();
+		protected ITweakerConsole console;
 
 		public TileController(ITweakerConsole console, TView view, HexGridCell<BaseNode> cell)
 		{
@@ -39,19 +42,34 @@ namespace Ghostbit.Tweaker.UI
 			View = view;
 			BaseCell = cell;
 			Node = BaseCell.Value as TNode;
-			Init();
 		}
 
-		private void Init()
+		public void Init()
 		{
 			AddListeners();
+			ConfigureView();
+		}
 
+		protected virtual void ConfigureView()
+		{
 			View.Scale = deselectedTileScale;
+
+			// Reasonable Defaults
+			View.TileColor = Color.white;
+			View.TileAlpha = 1f;
+			View.NameText.color = Color.black;
 		}
 	
-		public void Dispose()
+		public void Destroy(bool destroyView)
 		{
 			RemoveListeners();
+			if (View != null)
+			{
+				if (destroyView)
+				{
+					View.DestroySelf();
+				}
+			}
 		}
 
 		private void AddListeners()
@@ -68,48 +86,18 @@ namespace Ghostbit.Tweaker.UI
 			View.Deselected -= ViewDeselected;
 		}
 
-		private void ViewTapped(TileView view)
+		protected virtual void ViewTapped(TileView view)
 		{
 			logger.Trace("OnTileTapped: {0}", NodeType.ToString());
-			switch (Node.Type)
-			{
-				case BaseNode.NodeType.Root:
-					// ?
-					break;
-				case BaseNode.NodeType.Group:
-					GroupNode group = Node.Value as GroupNode;
-					logger.Trace("Group was tapped: {0}", group.FullName);
-					if (group == console.CurrentNode)
-					{
-						console.DisplayNode(group.Parent);
-					}
-					else
-					{
-						console.DisplayNode(group);
-					}
-					break;
-				case BaseNode.NodeType.Invokable:
-					// invoke
-					break;
-				case BaseNode.NodeType.Tweakable:
-					// edit
-					break;
-				case BaseNode.NodeType.Watchable:
-					// ?
-					break;
-				default:
-					logger.Warn("Unhandled node type tapped.");
-					break;
-			}
 		}
 
-		private void ViewSelected(TileView view)
+		protected virtual void ViewSelected(TileView view)
 		{
 			View.Scale = selectedTileScale;
 			View.GetComponent<RectTransform>().SetAsLastSibling();
 		}
 
-		private void ViewDeselected(TileView view)
+		protected virtual void ViewDeselected(TileView view)
 		{
 			View.Scale = deselectedTileScale;
 		}
