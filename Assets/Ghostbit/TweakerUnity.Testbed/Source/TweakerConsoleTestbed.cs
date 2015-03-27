@@ -10,8 +10,8 @@ namespace Ghostbit.Tweaker.UI.Testbed
 {
 	public class TweakerConsoleTestbed : MonoBehaviour
 	{
-		public TweakerConsole ConsolePrefab;
-		private TweakerConsole console;
+		public TweakerConsoleController ConsolePrefab;
+		private TweakerConsoleController console;
 		private ITweakerLogger logger;
 		private Tweaker tweaker;
 
@@ -34,16 +34,17 @@ namespace Ghostbit.Tweaker.UI.Testbed
 				TweakerOptionFlags.ScanForWatchables;
 			tweaker.Init(tweakerOptions, scanner);
 			tweaker.Scanner.Scan(scanOptions);
-		}
 
-		// Use this for initialization
-		void Start()
-		{
-			console = Instantiate(ConsolePrefab) as TweakerConsole;
+			console = Instantiate(ConsolePrefab) as TweakerConsoleController;
 			logger.Info("console instatiated: " + console);
 			console.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>(), false);
 			logger.Info("console parented to testbed canvas");
 			console.Init(tweaker);
+		}
+
+		void Start()
+		{
+			
 		}
 	}
 }

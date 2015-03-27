@@ -11,7 +11,7 @@ namespace Ghostbit.Tweaker.UI
 	{
 		private ITweakable tweakable;
 
-		public TweakableTileController(ITweakerConsole console, TweakableTileView view, HexGridCell<BaseNode> cell)
+		public TweakableTileController(IHexGridController console, TweakableTileView view, HexGridCell<BaseNode> cell)
 			: base(console, view, cell)
 		{
 			tweakable = Node.Tweakable;

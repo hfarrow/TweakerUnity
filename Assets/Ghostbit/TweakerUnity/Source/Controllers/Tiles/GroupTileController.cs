@@ -8,7 +8,7 @@ namespace Ghostbit.Tweaker.UI
 {
 	public class GroupTileController : TileController<TileView, GroupNode>
 	{
-		public GroupTileController(ITweakerConsole console, TileView view, HexGridCell<BaseNode> cell)
+		public GroupTileController(IHexGridController console, TileView view, HexGridCell<BaseNode> cell)
 			: base(console, view, cell)
 		{
 		}
@@ -20,7 +20,7 @@ namespace Ghostbit.Tweaker.UI
 			View.TileColor = Color.white;
 			View.FullName = Node.FullName;
 
-			if (Node == console.CurrentNode)
+			if (Node == console.CurrentDisplayNode)
 			{
 				View.TileColor = new Color(.2f, .2f, .2f);
 				View.NameText.color = Color.white;
@@ -30,7 +30,7 @@ namespace Ghostbit.Tweaker.UI
 		protected override void ViewTapped(TileView view)
 		{
 			logger.Trace("Group was tapped: {0}", Node.FullName);
-			if (Node == console.CurrentNode)
+			if (Node == console.CurrentDisplayNode)
 			{
 				if (Node.Parent != null)
 				{

@@ -34,9 +34,9 @@ namespace Ghostbit.Tweaker.UI
 		public TNode Node { get; private set; }
 
 		protected ITweakerLogger logger = LogManager.GetCurrentClassLogger();
-		protected ITweakerConsole console;
+		protected IHexGridController console;
 
-		public TileController(ITweakerConsole console, TView view, HexGridCell<BaseNode> cell)
+		public TileController(IHexGridController console, TView view, HexGridCell<BaseNode> cell)
 		{
 			this.console = console;
 			View = view;
@@ -54,10 +54,19 @@ namespace Ghostbit.Tweaker.UI
 		{
 			View.Scale = deselectedTileScale;
 
-			// Reasonable Defaults
-			View.TileColor = Color.white;
-			View.TileAlpha = 1f;
-			View.NameText.color = Color.black;
+			if(NodeType == UI.BaseNode.NodeType.Unknown)
+			{
+				View.TileAlpha = 0.6f;
+				View.Name = "<Unknown Type>";
+				View.FullName = "<Unknown Type>";
+			}
+			else
+			{
+				// Reasonable Defaults
+				View.TileColor = Color.white;
+				View.TileAlpha = 1f;
+				View.NameText.color = Color.black;
+			}
 		}
 	
 		public void Destroy(bool destroyView)

@@ -11,7 +11,7 @@ namespace Ghostbit.Tweaker.UI
 	{
 		private IInvokable invokable;
 
-		public InvokableTileController(ITweakerConsole console, TileView view, HexGridCell<BaseNode> cell)
+		public InvokableTileController(IHexGridController console, TileView view, HexGridCell<BaseNode> cell)
 			: base(console, view, cell)
 		{
 			invokable = Node.Invokable;

@@ -8,7 +8,7 @@ namespace Ghostbit.Tweaker.UI
 {
 	public static class TileControllerFactory
 	{
-		public static ITileController MakeController(TileView view, HexGridCell<BaseNode> cell, ITweakerConsole console)
+		public static ITileController MakeController(TileView view, HexGridCell<BaseNode> cell, IHexGridController console)
 		{
 			ITileController controller;
 			switch (cell.Value.Type)
@@ -26,7 +26,7 @@ namespace Ghostbit.Tweaker.UI
 					break;
 
 				case BaseNode.NodeType.Watchable:
-					controller = new TileController<TileView, WatchableNode>(console, view, cell);
+					controller = new WatchableTileController(console, view, cell);
 					break;
 
 				case BaseNode.NodeType.Unknown:

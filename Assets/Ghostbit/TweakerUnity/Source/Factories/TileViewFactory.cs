@@ -47,7 +47,7 @@ namespace Ghostbit.Tweaker.UI
 			view.name = cell.AxialCoord.ToString();
 			view.gameObject.SetActive(true);
 
-			float tileSize = 0.04f * Screen.width;
+			float tileSize = 0.06f * Screen.width;
 			float tileHeight = tileSize * 2f;
 			float tileWidth = Mathf.Sqrt(3f) / 2f * tileHeight;
 
