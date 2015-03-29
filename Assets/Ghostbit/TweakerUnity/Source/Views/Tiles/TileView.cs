@@ -90,15 +90,9 @@ namespace Ghostbit.Tweaker.UI
 			OnAwake();
 		}
 
-		public void OnDestroy()
+		protected virtual void OnDestroy()
 		{
-			Tapped = null;
-			Selected = null;
-			Deselected = null;
-
-			background.Tapped -= OnTapped;
-			background.Selected -= OnSelected;
-			background.Deselected -= OnDeselected;
+			
 		}
 
 		protected virtual void OnAwake()
@@ -108,6 +102,15 @@ namespace Ghostbit.Tweaker.UI
 
 		public void DestroySelf()
 		{
+			Tapped = null;
+			Selected = null;
+			Deselected = null;
+
+			background.Tapped -= OnTapped;
+			background.Selected -= OnSelected;
+			background.Deselected -= OnDeselected;
+
+			OnDestroy();
 			Destroy(gameObject);
 		}
 

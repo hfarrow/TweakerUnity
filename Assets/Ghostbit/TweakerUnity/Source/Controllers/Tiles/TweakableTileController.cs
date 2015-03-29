@@ -24,6 +24,19 @@ namespace Ghostbit.Tweaker.UI
 			View.TileColor = Color.cyan;
 			View.FullName = tweakable.Name;
 			View.Value = tweakable.GetValue().ToString();
+
+			Node.ValueChanged += ValueChanged;
+		}
+
+		public override void Destroy(bool destroyView)
+		{
+			Node.ValueChanged -= ValueChanged;
+			base.Destroy(destroyView);
+		}
+
+		public void ValueChanged(object value)
+		{
+			ConfigureView();
 		}
 
 		protected override void ViewTapped(TileView view)

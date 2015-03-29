@@ -15,6 +15,11 @@ namespace Ghostbit.Tweaker.UI
 			ShowLargeText(false);
 		}
 
+		protected override void OnDestroy()
+		{
+			
+		}
+
 		public Color ValueColor
 		{
 			get { return TweakableView.ValueText.color; }

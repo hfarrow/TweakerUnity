@@ -23,7 +23,7 @@ namespace Ghostbit.Tweaker.UI
 		public Tweaker Tweaker { get; private set; }
 		public TweakerTree Tree { get; private set; }
 
-		private InspectorController inspector;
+		private IInspectorController inspector;
 		private ITweakerLogger logger = LogManager.GetCurrentClassLogger();
 
 		// Must be called from awake of another script
@@ -38,17 +38,26 @@ namespace Ghostbit.Tweaker.UI
 
 		public void ShowInspector(BaseNode nodeToInspect)
 		{
-			if(inspector == null)
+			// Check if the current inspector cannot be re-used.
+			if(inspector != null && inspector.NodeType != nodeToInspect.Type)
 			{
-				CreateInspector();
+				inspector.Destroy();
+				inspector = null;
 			}
+
+			if (inspector == null)
+			{
+				CreateInspector(nodeToInspect.Type);
+			}
+
+			inspector.InspectNode(nodeToInspect);
 		}
 
-		private void CreateInspector()
+		private void CreateInspector(BaseNode.NodeType type)
 		{
 			InspectorView view = Instantiate(InspectorViewPrefab) as InspectorView;
 			view.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>(), false);
-			inspector = new InspectorController(view, GridController);
+			inspector = InspectorControllerFactory.MakeController(view, GridController, type);
 			inspector.Closed += InspectorClosed;
 		}
 

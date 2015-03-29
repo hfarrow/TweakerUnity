@@ -57,9 +57,23 @@ namespace Ghostbit.Tweaker.UI
 		public ITweakable Tweakable { get; private set; }
 		public override NodeType Type { get { return NodeType.Tweakable; } }
 
+		public event Action<object> ValueChanged;
+
 		public TweakableNode(ITweakable tweakable)
 		{
 			Tweakable = tweakable;
+		}
+
+		public void SetValue(object value)
+		{
+			object oldValue = Tweakable.GetValue();
+			Tweakable.SetValue(value);
+			object newValue = Tweakable.GetValue();
+
+			if (ValueChanged != null && newValue != oldValue)
+			{
+				ValueChanged(newValue);
+			}
 		}
 	}
 

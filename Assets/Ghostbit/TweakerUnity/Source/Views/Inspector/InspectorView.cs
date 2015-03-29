@@ -8,8 +8,15 @@ namespace Ghostbit.Tweaker.UI
 	public class InspectorView : MonoBehaviour
 	{
 		public InspectorBackgroundView BackgroundPrefab;
+		public InspectorHeaderView HeaderPrefab;
+		public InspectorStringView StringPrefab;
+
+		public GameObject HeaderContainer;
+		public GameObject ContentContainer;
+		public GameObject BackgroundContainer;
 
 		public InspectorBackgroundView Background { get; private set; }
+		public InspectorHeaderView Header { get; private set; }
 
 		public void Awake()
 		{
@@ -29,20 +36,34 @@ namespace Ghostbit.Tweaker.UI
 
 		private void InstatiatePrefabs()
 		{
-			Background = InstantiateInspectorComponent(BackgroundPrefab);
+			// Order matters: Back layer to front layer
+			Background = InstantiateInspectorComponent(BackgroundPrefab, BackgroundContainer);
+			Header = InstantiateInspectorComponent(HeaderPrefab, HeaderContainer);
 		}
 
-		private TComponent InstantiateInspectorComponent<TComponent>(TComponent prefab)
+		private TComponent InstantiateInspectorComponent<TComponent>(TComponent prefab, GameObject parent = null)
 			where TComponent : Component
 		{
-			var instance = Instantiate(prefab) as TComponent;
-			ParentToThis(instance);
-			return instance;
+			var component = Instantiate(prefab) as TComponent;
+			if(parent == null)
+			{
+				parent = gameObject;
+			}
+			SetComponentParent(component, parent);
+			return component;
 		}
 
-		private void ParentToThis(Component component)
+		private void SetComponentParent(Component child, GameObject parent)
 		{
-			component.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>(), false);
+			child.GetComponent<RectTransform>().SetParent(parent.GetComponent<RectTransform>(), false);
+			child.GetComponent<RectTransform>().SetAsLastSibling();
+		}
+
+		public InspectorStringView AddStringView()
+		{
+			InspectorStringView view = InstantiateInspectorComponent(StringPrefab, ContentContainer);
+			// TODO: position correctly if there are multiple views in the content view.
+			return view;
 		}
 	}
 }

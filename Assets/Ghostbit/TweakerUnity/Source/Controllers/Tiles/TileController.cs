@@ -69,7 +69,7 @@ namespace Ghostbit.Tweaker.UI
 			}
 		}
 	
-		public void Destroy(bool destroyView)
+		public virtual void Destroy(bool destroyView)
 		{
 			RemoveListeners();
 			if (View != null)
