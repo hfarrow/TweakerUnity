@@ -7,15 +7,13 @@ namespace Ghostbit.Tweaker.UI
 {
 	public class TweakableInspectorController : InspectorController<TweakableNode>
 	{
-		public TweakableNode TweakableNode { get; private set; }
 		public ITweakable Tweakable { get; private set; }
-
-		public override string Title { get { return TweakableNode.Tweakable.Name; } }
+		public override string Title { get { return Tweakable.Name; } }
 
 		public TweakableInspectorController(InspectorView view, IHexGridController gridController)
 			: base(view, gridController)
 		{
-
+			
 		}
 
 		protected override void OnInspectNode()
@@ -26,21 +24,22 @@ namespace Ghostbit.Tweaker.UI
 				return;
 			}
 
-			TweakableNode = CurrentNode as TweakableNode;
-			Tweakable = TweakableNode.Tweakable;
+			Tweakable = CurrentNode.Tweakable;
 			base.OnInspectNode();
 
-			if(Tweakable.TweakableType == typeof(string))
-			{
-				InspectorStringView stringView = view.AddStringView();
-				stringView.InputText.text = Tweakable.GetValue().ToString();
-				stringView.ValueChanged += ValueChanged;
-			}
-		}
+			view.Header.TypeText.text = Tweakable.TweakableType.FullName;
 
-		private void ValueChanged(object value)
-		{
-			TweakableNode.SetValue(value);
+			foreach(IInspectorContentView contentView in contentFactory.MakeContentViews(Tweakable))
+			{
+				if (contentView != null)
+				{
+					contentViews.Add(contentView);
+				}
+				else
+				{
+					view.Header.TypeText.text = "[Unsupported] " + Tweakable.TweakableType.FullName;
+				}
+			}
 		}
 
 		public override void Destroy()

@@ -2,16 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
 namespace Ghostbit.Tweaker.UI
 {
-	public class InspectorStringView : MonoBehaviour, IInspectorContentView
+	public class InspectorBoolView : MonoBehaviour, IInspectorContentView
 	{
-		public InputField InputText;
-		public event Action<string> ValueChanged;
+		public Toggle Toggle;
+		public Text ToggleText;
+		public event Action<bool> ValueChanged;
 
 		public void Awake()
 		{
-			InputText.onEndEdit.AddListener(OnEndEdit);
+			Toggle.onValueChanged.AddListener(OnValueChanged);
 		}
 
 		public void DestroySelf()
@@ -21,11 +23,11 @@ namespace Ghostbit.Tweaker.UI
 
 		public void Destroy()
 		{
-			InputText.onEndEdit.RemoveAllListeners();
+			Toggle.onValueChanged.RemoveAllListeners();
 			ValueChanged = null;
 		}
 
-		private void OnEndEdit(string value)
+		private void OnValueChanged(bool value)
 		{
 			if (ValueChanged != null)
 			{

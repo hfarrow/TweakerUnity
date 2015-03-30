@@ -439,5 +439,30 @@ namespace Ghostbit.Tweaker.Core.Tests
 			Assert.IsNull(tweakable.StrongInstance);
 		}
 
+		[Test]
+		public void TweakableValueChangedEvent()
+		{
+			Scanner scanner = new Scanner();
+			ScanOptions options = new ScanOptions();
+			options.Assemblies.ScannableRefs = new Assembly[] { Assembly.GetExecutingAssembly() };
+			options.Types.ScannableRefs = new Type[] { typeof(TestClass) };
+
+			TweakableManager manager = new TweakableManager(scanner);
+			scanner.Scan(options);
+
+			var tweakable = manager.GetTweakable("IntProperty");
+			TestClass.IntProperty = 0;
+
+			int expectedValue = 1;
+			bool wasDispatched = false;
+			tweakable.ValueChanged += (oldValue, newValue) =>
+			{
+				Assert.AreEqual(0, oldValue);
+				Assert.AreEqual(expectedValue, newValue);
+				wasDispatched = true;
+			};
+			tweakable.SetValue(expectedValue);
+			Assert.IsTrue(wasDispatched);
+		}
 	}
 }

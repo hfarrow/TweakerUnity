@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Ghostbit.Tweaker.UI
 {
-	public interface ITileController
+	public interface ITileController : IViewController
 	{
 		Type ViewType { get; }
 		BaseNode.NodeType NodeType { get; }
@@ -67,6 +67,11 @@ namespace Ghostbit.Tweaker.UI
 				View.TileAlpha = 1f;
 				View.NameText.color = Color.black;
 			}
+		}
+
+		public void Destroy()
+		{
+			Destroy(true);
 		}
 	
 		public virtual void Destroy(bool destroyView)

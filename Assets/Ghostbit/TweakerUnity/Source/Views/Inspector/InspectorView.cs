@@ -9,7 +9,9 @@ namespace Ghostbit.Tweaker.UI
 	{
 		public InspectorBackgroundView BackgroundPrefab;
 		public InspectorHeaderView HeaderPrefab;
-		public InspectorStringView StringPrefab;
+		public InspectorStringView StringEditPrefab;
+		public InspectorStringView StringSmallEditPrefab;
+		public InspectorBoolView BoolEditPrefab;
 
 		public GameObject HeaderContainer;
 		public GameObject ContentContainer;
@@ -41,13 +43,13 @@ namespace Ghostbit.Tweaker.UI
 			Header = InstantiateInspectorComponent(HeaderPrefab, HeaderContainer);
 		}
 
-		private TComponent InstantiateInspectorComponent<TComponent>(TComponent prefab, GameObject parent = null)
+		public TComponent InstantiateInspectorComponent<TComponent>(TComponent prefab, GameObject parent = null)
 			where TComponent : Component
 		{
 			var component = Instantiate(prefab) as TComponent;
 			if(parent == null)
 			{
-				parent = gameObject;
+				parent = ContentContainer;
 			}
 			SetComponentParent(component, parent);
 			return component;
@@ -57,13 +59,6 @@ namespace Ghostbit.Tweaker.UI
 		{
 			child.GetComponent<RectTransform>().SetParent(parent.GetComponent<RectTransform>(), false);
 			child.GetComponent<RectTransform>().SetAsLastSibling();
-		}
-
-		public InspectorStringView AddStringView()
-		{
-			InspectorStringView view = InstantiateInspectorComponent(StringPrefab, ContentContainer);
-			// TODO: position correctly if there are multiple views in the content view.
-			return view;
 		}
 	}
 }

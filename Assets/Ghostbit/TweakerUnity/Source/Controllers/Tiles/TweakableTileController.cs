@@ -25,18 +25,18 @@ namespace Ghostbit.Tweaker.UI
 			View.FullName = tweakable.Name;
 			View.Value = tweakable.GetValue().ToString();
 
-			Node.ValueChanged += ValueChanged;
+			Node.Tweakable.ValueChanged += ValueChanged;
 		}
 
 		public override void Destroy(bool destroyView)
 		{
-			Node.ValueChanged -= ValueChanged;
+			Node.Tweakable.ValueChanged -= ValueChanged;
 			base.Destroy(destroyView);
 		}
 
-		public void ValueChanged(object value)
+		public void ValueChanged(object oldValue, object newValue)
 		{
-			ConfigureView();
+			View.Value = newValue.ToString();
 		}
 
 		protected override void ViewTapped(TileView view)

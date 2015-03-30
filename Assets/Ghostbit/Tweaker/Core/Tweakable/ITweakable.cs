@@ -27,6 +27,12 @@ namespace Ghostbit.Tweaker.Core
 		object GetValue();
 
 		/// <summary>
+		/// Dispatched when the value of the tweakable is changed via SetValue(object value).
+		/// The action param is the old value first and the new value second.
+		/// </summary>
+		event Action<object, object> ValueChanged;
+
+		/// <summary>
 		/// The type represented by the tweakable object
 		/// </summary>
 		/// <remarks>

@@ -13,6 +13,7 @@ namespace Ghostbit.Tweaker.UI
 		Tweaker Tweaker { get; }
 		TweakerTree Tree { get; }
 		void ShowInspector(BaseNode nodeToInspect);
+		void DestroyObject(GameObject go);
 	}
 
 	public class TweakerConsoleController : MonoBehaviour, ITweakerConsoleController
@@ -64,6 +65,11 @@ namespace Ghostbit.Tweaker.UI
 		private void InspectorClosed()
 		{
 			inspector = null;
+		}
+
+		public void DestroyObject(GameObject go)
+		{
+			Destroy(go);
 		}
 	}
 }

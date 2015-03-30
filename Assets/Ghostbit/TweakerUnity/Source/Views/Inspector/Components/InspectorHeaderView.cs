@@ -8,5 +8,6 @@ namespace Ghostbit.Tweaker.UI
 	public class InspectorHeaderView : MonoBehaviour
 	{
 		public Text TitleText;
+		public Text TypeText;
 	}
 }

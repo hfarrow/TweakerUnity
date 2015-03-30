@@ -11,6 +11,7 @@ namespace Ghostbit.Tweaker.Core
 		public TweakableInfo<T> TweakableInfo { get; private set; }
 		public Type TweakableType { get; private set; }
 		public ITweakableManager Manager { get; set; }
+		public event Action<object, object> ValueChanged;
 
 		protected MethodInfo Setter { get; set; }
 		protected MethodInfo Getter { get; set; }
@@ -196,10 +197,21 @@ namespace Ghostbit.Tweaker.Core
 			if (CheckInstanceIsValid())
 			{
 				CheckValueType(value);
+				object oldValue = Getter.Invoke(GetInternalStrongInstance(), null);
 				value = CheckRange((T)value);
+
+				if (oldValue == value)
+				{
+					return;
+				}
+
 				try
 				{
 					Setter.Invoke(GetInternalStrongInstance(), new object[] { value });
+					if (ValueChanged != null)
+					{
+						ValueChanged(oldValue, value);
+					}
 				}
 				catch (Exception e)
 				{
