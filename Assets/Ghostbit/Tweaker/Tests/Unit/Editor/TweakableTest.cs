@@ -464,5 +464,25 @@ namespace Ghostbit.Tweaker.Core.Tests
 			tweakable.SetValue(expectedValue);
 			Assert.IsTrue(wasDispatched);
 		}
+
+		[Test]
+		public void MakeTweakableFromVirtualField()
+		{
+			const string fieldName = "TestVirtualField";
+			TweakableInfo<int> info = new TweakableInfo<int>(fieldName, null, null, null);
+			ITweakable tweakable = TweakableFactory.MakeTweakableFromInfo(info);
+			Assert.IsNotNull(tweakable);
+			Assert.AreEqual(fieldName, tweakable.Name);
+			Assert.AreEqual(0, tweakable.GetValue());
+			tweakable.SetValue(1);
+			Assert.AreEqual(1, tweakable.GetValue());
+
+			tweakable = TweakableFactory.MakeTweakable(typeof(int), fieldName, "waka waka");
+			Assert.IsNotNull(tweakable);
+			Assert.AreEqual(fieldName, tweakable.Name);
+			Assert.AreEqual(0, tweakable.GetValue());
+			tweakable.SetValue(1);
+			Assert.AreEqual(1, tweakable.GetValue());
+		}
 	}
 }

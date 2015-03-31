@@ -74,32 +74,39 @@ namespace Ghostbit.Tweaker.UI
 				return;
 			}
 
-			if (nodeToDisplay.Type == BaseNode.NodeType.Group)
+			// Invokables are treated as a group node. The child TweakableNode's bind to the invokable's args.
+			if (nodeToDisplay.Type == BaseNode.NodeType.Group ||
+				nodeToDisplay.Type == BaseNode.NodeType.Invokable)
 			{
-				// BaseNode oldNode = CurrentNode;
-				CurrentDisplayNode = nodeToDisplay;
-				int numChildren = nodeToDisplay.Children.Count;
-				List<BaseNode> displayList = new List<BaseNode>(numChildren + 1);
+				DisplayGroupNode(nodeToDisplay);
+			}
+		}
 
-				displayList.Add(nodeToDisplay);
-				displayList.AddRange(nodeToDisplay.Children);
+		private void DisplayGroupNode(BaseNode nodeToDisplay)
+		{
+			// BaseNode oldNode = CurrentNode;
+			CurrentDisplayNode = nodeToDisplay;
+			int numChildren = nodeToDisplay.Children.Count;
+			List<BaseNode> displayList = new List<BaseNode>(numChildren + 1);
 
-				// First let's destroy controllers that will no longer be needed.
-				// (Fewer views than available cells.
-				for (uint orderedIndex = (uint)displayList.Count; orderedIndex < orderedControllers.Length; ++orderedIndex)
+			displayList.Add(nodeToDisplay);
+			displayList.AddRange(nodeToDisplay.Children);
+
+			// First let's destroy controllers that will no longer be needed.
+			// (Fewer views than available cells.
+			for (uint orderedIndex = (uint)displayList.Count; orderedIndex < orderedControllers.Length; ++orderedIndex)
+			{
+				ITileController controller = orderedControllers[orderedIndex];
+				if (controller != null)
 				{
-					ITileController controller = orderedControllers[orderedIndex];
-					if (controller != null)
-					{
-						DestroyController(orderedIndex, true);
-					}
+					DestroyController(orderedIndex, true);
 				}
+			}
 
-				for (uint orderedIndex = 0; orderedIndex < displayList.Count; ++orderedIndex)
-				{
-					BaseNode node = displayList[(int)orderedIndex];
-					SetupTileController(orderedIndex, node);
-				}
+			for (uint orderedIndex = 0; orderedIndex < displayList.Count; ++orderedIndex)
+			{
+				BaseNode node = displayList[(int)orderedIndex];
+				SetupTileController(orderedIndex, node);
 			}
 		}
 

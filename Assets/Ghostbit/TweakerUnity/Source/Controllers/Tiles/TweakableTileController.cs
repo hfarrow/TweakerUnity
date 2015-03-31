@@ -23,7 +23,17 @@ namespace Ghostbit.Tweaker.UI
 			View.Name = tweakable.ShortName;
 			View.TileColor = Color.cyan;
 			View.FullName = tweakable.Name;
-			View.Value = tweakable.GetValue().ToString();
+
+			object value = tweakable.GetValue();
+
+			if (value != null)
+			{
+				View.Value = value.ToString();
+			}
+			else
+			{
+				View.Value = "null";
+			}
 
 			Node.Tweakable.ValueChanged += ValueChanged;
 		}

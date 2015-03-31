@@ -53,7 +53,17 @@ namespace Ghostbit.Tweaker.UI
 		{
 			InspectorStringView stringView = inspectorView.InstantiateInspectorComponent(inspectorView.StringEditPrefab);
 			stringView.InputText.targetGraphic.color = successColor;
-			stringView.InputText.text = tweakable.GetValue().ToString();
+
+			object value = tweakable.GetValue();
+			if(value != null)
+			{
+				stringView.InputText.text = value.ToString();
+			}
+			else
+			{
+				stringView.InputText.text = "";
+			}
+			
 			stringView.ValueChanged += (newValue) =>
 			{
 				tweakable.SetValue(newValue);

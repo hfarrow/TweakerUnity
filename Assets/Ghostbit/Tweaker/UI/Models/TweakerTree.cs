@@ -45,10 +45,46 @@ namespace Ghostbit.Tweaker.UI
 	{
 		public IInvokable Invokable { get; private set; }
 		public override NodeType Type { get { return NodeType.Invokable; } }
+		private ITweakable[] argTweakables;
 
 		public InvokableNode(IInvokable invokable)
 		{
 			Invokable = invokable;
+
+			if (invokable != null)
+			{
+				BindArgsToTweakables();
+			}
+		}
+
+		private void BindArgsToTweakables()
+		{
+			// Add an empy invokable node that will execute the invokable.
+			Children.Add(new InvokableNode(null));
+
+			Type[] argTypes = Invokable.ArgTypes;
+			argTweakables = new ITweakable[argTypes.Length];
+
+			for(int i = 0; i < argTypes.Length; ++i)
+			{
+				Type argType = argTypes[i];
+				ITweakable tweakable = TweakableFactory.MakeTweakable(argType, 
+					string.Format("Arg-{0}", i), 
+					Invokable.InvokableInfo.ArgDescriptions[i]);
+				argTweakables[i] = tweakable;
+
+				Children.Add(new TweakableNode(tweakable));
+			}
+		}
+
+		public void Invoke()
+		{
+			object[] args = new object[argTweakables.Length];
+			for (int i = 0; i < args.Length; ++i)
+			{
+				args[i] = argTweakables[i].GetValue();
+			}
+			Invokable.Invoke(args);
 		}
 	}
 
@@ -142,7 +178,7 @@ namespace Ghostbit.Tweaker.UI
 				// Create a list for each type of node
 				// TODO: decide on a more generic way to do this.
 				// What if the number of node types explodes?
-				// Dictionary<Type, List<Type>> or add sorting mechanism directory to Tree data structure
+				// Dictionary<Type, List<Type>> or add sorting mechanism to Tree data structure
 				List<GroupNode> groups = new List<GroupNode>();
 				List<InvokableNode> invokables = new List<InvokableNode>();
 				List<TweakableNode> tweakables = new List<TweakableNode>();

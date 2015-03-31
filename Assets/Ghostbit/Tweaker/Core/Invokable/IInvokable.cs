@@ -16,12 +16,19 @@ namespace Ghostbit.Tweaker.Core
 		InvokableInfo InvokableInfo { get; }
 
 		/// <summary>
+		/// Get the type of each argument this invokable requires when invoked.
+		/// </summary>
+		Type[] ArgTypes { get; }
+
+		/// <summary>
 		/// Invoke the invokable object with the provided arguments.
 		/// Throws InvokeException, InvokeArgNumberException, InvokeArgTypeException
 		/// </summary>
 		/// <param name="args">Arguments to invoke with.</param>
 		/// <returns>The return value of the invokable.</returns>
 		object Invoke(params object[] args);
+
+		//object InvokeWithArgArray(object[])
 
 		/// <summary>
 		/// The manager that this invokable is registered to.

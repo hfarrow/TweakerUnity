@@ -60,5 +60,13 @@ namespace Ghostbit.Tweaker.Core
 			StepSize = stepSize;
 			ToggleValues = toggleValues;
 		}
+
+		public TweakableInfo(string name, string description = "") :
+			base(name, 0, description)
+		{
+			Range = null;
+			StepSize = null;
+			ToggleValues = null;
+		}
 	}
 }

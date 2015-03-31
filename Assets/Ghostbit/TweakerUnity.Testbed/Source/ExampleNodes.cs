@@ -17,10 +17,13 @@ public class ExampleNodes
 	[Tweakable("MyFloat")]
 	public static float root_float = 1.0f;
 
-	[Invokable("MyCommand")]
-	public static void root_command()
+	[Invokable("MyCommand", Description="This is a test command with args and void return type.")]
+	public static void root_command(
+		[ArgDescription("int arg1")] int arg1,
+		[ArgDescription("int arg1")] string arg2,
+		[ArgDescription("int arg1")] bool arg3)
 	{
-		LogManager.GetCurrentClassLogger().Trace("root_command invoked");
+		LogManager.GetCurrentClassLogger().Trace("root_command invoked: {0}, {1}, {2}", arg1, arg2, arg3);
 	}
 
 	#region Group Dog

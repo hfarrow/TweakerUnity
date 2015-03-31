@@ -135,6 +135,35 @@ namespace Ghostbit.Tweaker.Core
 			return new BaseTweakable<T>(info, fieldInfo, weakRef);
 		}
 
+		public static ITweakable MakeTweakableFromInfo<T>(TweakableInfo<T> info)
+		{
+			VirtualField<T> field = new VirtualField<T>();
+			ITweakable tweakable = new BaseTweakable<T>(info, field);
+			return tweakable;
+		}
+
+		/// <summary>
+		/// This will create a virtual field bound to a tweakable.
+		/// TODO: allow range, step, and toggles to be passed in.
+		/// </summary>
+		/// <param name="tweakableType"></param>
+		/// <param name="name"></param>
+		/// <param name="description"></param>
+		/// <returns></returns>
+		public static ITweakable MakeTweakable(Type tweakableType, string name, string description)
+		{
+			Type infoType = typeof(TweakableInfo<>).MakeGenericType(tweakableType);
+			Type fieldType = typeof(VirtualField<>).MakeGenericType(tweakableType);
+			Type baseTweakableType = typeof(BaseTweakable<>).MakeGenericType(tweakableType);
+			object info = Activator.CreateInstance(infoType, name, description);
+			object field = Activator.CreateInstance(fieldType);
+			ITweakable tweakable = Activator.CreateInstance(
+				baseTweakableType,
+				Convert.ChangeType(info, infoType),
+				Convert.ChangeType(field, fieldType)) as ITweakable;
+			return tweakable;
+		}
+
 		private static string GetFinalName(string name, IBoundInstance instance)
 		{
 			if (instance == null)
