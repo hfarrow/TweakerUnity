@@ -10,6 +10,7 @@ namespace Ghostbit.Tweaker.UI
 	public class InvokableTileController : TileController<TileView, InvokableNode>
 	{
 		private IInvokable invokable;
+		private ITweakerLogger logger = LogManager.GetCurrentClassLogger();
 
 		public InvokableTileController(IHexGridController console, TileView view, HexGridCell<BaseNode> cell)
 			: base(console, view, cell)
@@ -52,7 +53,20 @@ namespace Ghostbit.Tweaker.UI
 				if (invokable == null && grid.CurrentDisplayNode.Type == UI.BaseNode.NodeType.Invokable)
 				{
 					var parentInvokableNode = grid.CurrentDisplayNode as InvokableNode;
-					parentInvokableNode.Invoke();
+					try
+					{
+						parentInvokableNode.Invoke();
+						view.ShowSuccess();
+						if (parentInvokableNode.Parent != null)
+						{
+							grid.DisplayNode(parentInvokableNode.Parent);
+						}
+					}
+					catch(Exception ex)
+					{
+						view.ShowError();
+						logger.Error(ex.Message);
+					}
 				}
 				else
 				{

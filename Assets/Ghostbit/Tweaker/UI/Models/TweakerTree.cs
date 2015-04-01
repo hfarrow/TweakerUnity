@@ -68,9 +68,11 @@ namespace Ghostbit.Tweaker.UI
 			for(int i = 0; i < argTypes.Length; ++i)
 			{
 				Type argType = argTypes[i];
+				object virtualFieldRef;
 				ITweakable tweakable = TweakableFactory.MakeTweakable(argType, 
 					string.Format("Arg-{0}", i), 
-					Invokable.InvokableInfo.ArgDescriptions[i]);
+					Invokable.InvokableInfo.ArgDescriptions[i],
+					out virtualFieldRef);
 				argTweakables[i] = tweakable;
 
 				Children.Add(new TweakableNode(tweakable));
@@ -93,9 +95,17 @@ namespace Ghostbit.Tweaker.UI
 		public ITweakable Tweakable { get; private set; }
 		public override NodeType Type { get { return NodeType.Tweakable; } }
 
+		private object virtualFieldRef;
+
 		public TweakableNode(ITweakable tweakable)
 		{
 			Tweakable = tweakable;
+		}
+
+		public TweakableNode(ITweakable tweakable, object virtualFieldRef)
+			: this(tweakable)
+		{
+			this.virtualFieldRef = virtualFieldRef;
 		}
 	}
 

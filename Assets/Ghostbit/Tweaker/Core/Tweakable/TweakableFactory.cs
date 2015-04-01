@@ -135,10 +135,11 @@ namespace Ghostbit.Tweaker.Core
 			return new BaseTweakable<T>(info, fieldInfo, weakRef);
 		}
 
-		public static ITweakable MakeTweakableFromInfo<T>(TweakableInfo<T> info)
+		public static ITweakable MakeTweakableFromInfo<T>(TweakableInfo<T> info, out object virtualFieldRef)
 		{
 			VirtualField<T> field = new VirtualField<T>();
 			ITweakable tweakable = new BaseTweakable<T>(info, field);
+			virtualFieldRef = field;
 			return tweakable;
 		}
 
@@ -149,8 +150,12 @@ namespace Ghostbit.Tweaker.Core
 		/// <param name="tweakableType"></param>
 		/// <param name="name"></param>
 		/// <param name="description"></param>
+		/// <param name="virtualFieldRef">A strong reference to the internal virtual field. 
+		/// If you do not maintain a strong reference to this opaque object, the tweakable will become invalid
+		/// when the virtual field is garbage collected. The tweakable created by this method
+		/// is not bound to a class member defined in code which is the reason for this param.</param>
 		/// <returns></returns>
-		public static ITweakable MakeTweakable(Type tweakableType, string name, string description)
+		public static ITweakable MakeTweakable(Type tweakableType, string name, string description, out object virtualFieldRef)
 		{
 			Type infoType = typeof(TweakableInfo<>).MakeGenericType(tweakableType);
 			Type fieldType = typeof(VirtualField<>).MakeGenericType(tweakableType);
@@ -161,6 +166,8 @@ namespace Ghostbit.Tweaker.Core
 				baseTweakableType,
 				Convert.ChangeType(info, infoType),
 				Convert.ChangeType(field, fieldType)) as ITweakable;
+
+			virtualFieldRef = field;
 			return tweakable;
 		}
 

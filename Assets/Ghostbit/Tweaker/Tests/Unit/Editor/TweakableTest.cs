@@ -469,15 +469,17 @@ namespace Ghostbit.Tweaker.Core.Tests
 		public void MakeTweakableFromVirtualField()
 		{
 			const string fieldName = "TestVirtualField";
+			object virtualFieldRef;
+
 			TweakableInfo<int> info = new TweakableInfo<int>(fieldName, null, null, null);
-			ITweakable tweakable = TweakableFactory.MakeTweakableFromInfo(info);
+			ITweakable tweakable = TweakableFactory.MakeTweakableFromInfo(info, out virtualFieldRef);
 			Assert.IsNotNull(tweakable);
 			Assert.AreEqual(fieldName, tweakable.Name);
 			Assert.AreEqual(0, tweakable.GetValue());
 			tweakable.SetValue(1);
 			Assert.AreEqual(1, tweakable.GetValue());
 
-			tweakable = TweakableFactory.MakeTweakable(typeof(int), fieldName, "waka waka");
+			tweakable = TweakableFactory.MakeTweakable(typeof(int), fieldName, "waka waka", out virtualFieldRef);
 			Assert.IsNotNull(tweakable);
 			Assert.AreEqual(fieldName, tweakable.Name);
 			Assert.AreEqual(0, tweakable.GetValue());

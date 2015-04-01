@@ -77,14 +77,30 @@ namespace Ghostbit.Tweaker.Core
 			Type[] providedArgTypes = new Type[args.Length];
 			for (var i = 0; i < args.Length; ++i)
 			{
-				providedArgTypes[i] = args[i].GetType();
+				if (args[i] != null)
+				{
+					providedArgTypes[i] = args[i].GetType();
+				}
 			}
 
 			for (var i = 0; i < args.Length; ++i)
 			{
-				if (!argTypes[i].IsAssignableFrom(providedArgTypes[i]))
+				if (args[i] != null && !argTypes[i].IsAssignableFrom(providedArgTypes[i]))
 				{
-					throw new InvokeArgTypeException(Name, args, providedArgTypes, argTypes);
+					throw new InvokeArgTypeException(Name, args, providedArgTypes, argTypes,
+						"Target arg is not assignable from the provided arg.");
+				}
+				else if(args[i] == null)
+				{
+					if (argTypes[i].IsValueType)
+					{
+						args[i] = Activator.CreateInstance(argTypes[i]);
+						if (args[i] == null)
+						{
+							throw new InvokeArgTypeException(Name, args, providedArgTypes, argTypes,
+								string.Format("Could not construct an instance of value type parameter {0}.", argTypes[i].FullName));
+						}
+					}
 				}
 			}
 		}

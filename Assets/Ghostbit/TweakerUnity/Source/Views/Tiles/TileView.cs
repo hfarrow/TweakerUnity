@@ -17,6 +17,9 @@ namespace Ghostbit.Tweaker.UI
 		public event Action<TileView> Selected;
 		public event Action<TileView> Deselected;
 
+		private Color successColor = Color.green;
+		private Color errorColor = Color.red;
+
 		public virtual Vector2 Scale
 		{
 			get { return scale; }
@@ -32,7 +35,10 @@ namespace Ghostbit.Tweaker.UI
 		public Color TileColor
 		{
 			get { return background.TileImage.color; }
-			set { background.TileImage.color = value; }
+			set
+			{
+				background.TileImage.color = value;
+			}
 		}
 
 		public float TileAlpha
@@ -158,6 +164,16 @@ namespace Ghostbit.Tweaker.UI
 			{
 				Deselected(this);
 			}
+		}
+
+		public void ShowSuccess()
+		{
+			TileColor = successColor;
+		}
+
+		public void ShowError()
+		{
+			TileColor = errorColor;
 		}
 
 		private void ShowFullName(bool show)

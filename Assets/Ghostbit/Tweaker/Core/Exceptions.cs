@@ -48,11 +48,13 @@ namespace Ghostbit.Tweaker.Core
 				return "";
 			}
 
-			StringBuilder str = new StringBuilder(objects[0].ToString());
+
+			object obj = objects[0];
+			StringBuilder str = new StringBuilder(objects[0] != null ? objects[0].ToString() : "");
 			for(var i = 1; i < objects.Length; ++i)
 			{
 				str.Append(",");
-				str.Append(objects[i].ToString());
+				str.Append(objects[i] != null ? objects[i].ToString() : "");
 			}
 			return str.ToString();
 		}
@@ -64,11 +66,11 @@ namespace Ghostbit.Tweaker.Core
 				return "";
 			}
 
-			StringBuilder str = new StringBuilder(types[0].FullName);
+			StringBuilder str = new StringBuilder(types[0] != null ? types[0].FullName : "");
 			for (var i = 1; i < types.Length; ++i)
 			{
 				str.Append(",");
-				str.Append(types[i].FullName);
+				str.Append(types[i] != null ? types[i].FullName : "");
 			}
 			return str.ToString();
 		}
@@ -85,9 +87,9 @@ namespace Ghostbit.Tweaker.Core
 
 	public class InvokeArgTypeException : Exception, ISerializable
 	{
-		public InvokeArgTypeException(string name, object[] args, Type[] argTypes, Type[] expectedArgTypes)
-			: base(string.Format("Invokation of '{0}({1})' failed. The expected arg types are [{2}] but [{3}] was provided.",
-			name, Printer.PrintObjectArray(args), Printer.PrintTypeArray(expectedArgTypes), Printer.PrintTypeArray(argTypes)))
+		public InvokeArgTypeException(string name, object[] args, Type[] argTypes, Type[] expectedArgTypes, string extraMessage = "")
+			: base(string.Format("Invokation of '{0}({1})' failed. The expected arg types are [{2}] but [{3}] was provided. {4}",
+			name, Printer.PrintObjectArray(args), Printer.PrintTypeArray(expectedArgTypes), Printer.PrintTypeArray(argTypes), extraMessage))
 		{
 
 		}
