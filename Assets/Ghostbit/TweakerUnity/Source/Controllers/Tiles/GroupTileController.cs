@@ -8,6 +8,9 @@ namespace Ghostbit.Tweaker.UI
 {
 	public class GroupTileController : TileController<TileView, GroupNode>
 	{
+		public static Color GroupRootTileColor = new Color(.2f, .2f, .2f);
+		public static Color GroupRootNameTextColor = Color.white;
+
 		public GroupTileController(IHexGridController console, TileView view, HexGridCell<BaseNode> cell)
 			: base(console, view, cell)
 		{
@@ -22,8 +25,8 @@ namespace Ghostbit.Tweaker.UI
 
 			if (Node == grid.CurrentDisplayNode)
 			{
-				View.TileColor = new Color(.2f, .2f, .2f);
-				View.NameText.color = Color.white;
+				View.TileColor = GroupRootTileColor;
+				View.NameText.color = GroupRootNameTextColor;
 			}
 		}
 

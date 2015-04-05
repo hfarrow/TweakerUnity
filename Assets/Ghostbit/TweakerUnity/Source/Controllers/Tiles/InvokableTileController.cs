@@ -34,8 +34,17 @@ namespace Ghostbit.Tweaker.UI
 				View.Name = invokable.ShortName;
 				View.FullName = invokable.Name;
 			}
-			View.TileColor = Color.blue;
-			View.NameText.color = Color.white;
+
+			if (grid.CurrentDisplayNode == Node)
+			{
+				View.TileColor = GroupTileController.GroupRootTileColor;
+				View.NameText.color = GroupTileController.GroupRootNameTextColor;
+			}
+			else
+			{
+				View.TileColor = Color.blue;
+				View.NameText.color = Color.white;
+			}
 		}
 
 		protected override void ViewTapped(TileView view)
