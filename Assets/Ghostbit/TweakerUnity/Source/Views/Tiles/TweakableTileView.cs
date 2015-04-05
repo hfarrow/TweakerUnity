@@ -12,7 +12,6 @@ namespace Ghostbit.Tweaker.UI
 
 		protected override void OnAwake()
 		{
-			ShowLargeText(false);
 		}
 
 		protected override void OnDestroy()
@@ -26,7 +25,6 @@ namespace Ghostbit.Tweaker.UI
 			set
 			{
 				TweakableView.ValueText.color = value;
-				TweakableView.ValueLargeText.color = value; 
 			}
 		}
 
@@ -36,7 +34,6 @@ namespace Ghostbit.Tweaker.UI
 			set
 			{
 				TweakableView.ValueText.text = value;
-				TweakableView.ValueLargeText.text = value;
 			}
 		}
 
@@ -47,20 +44,12 @@ namespace Ghostbit.Tweaker.UI
 
 		public override void OnSelected(TileBackgroundView defaultView)
 		{
-			ShowLargeText(true);
 			base.OnSelected(defaultView);
 		}
 
 		public override void OnDeselected(TileBackgroundView defaultView)
 		{
-			ShowLargeText(false);
 			base.OnDeselected(defaultView);
-		}
-
-		private void ShowLargeText(bool show)
-		{
-			TweakableView.ValueText.gameObject.SetActive(!show);
-			TweakableView.ValueLargeText.gameObject.SetActive(show);
 		}
 	}
 }

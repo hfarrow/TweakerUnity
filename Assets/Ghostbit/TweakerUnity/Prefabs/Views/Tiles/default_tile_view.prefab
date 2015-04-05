@@ -29,7 +29,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BackgroundPrefab: {fileID: 11498534, guid: 355b7dffd09ff4c88a64d31582fdc077, type: 2}
   UIViewPrefab: {fileID: 11459660, guid: dfcf94b5a98e641ed90134a7529bc257, type: 2}
-  FullNamePrefab: {fileID: 11465466, guid: ef12d4b290f1b4f83857323be5778fa0, type: 2}
 --- !u!224 &22447406
 RectTransform:
   m_ObjectHideFlags: 1
@@ -45,7 +44,7 @@ RectTransform:
   m_AnchorMin: {x: .5, y: .5}
   m_AnchorMax: {x: .5, y: .5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 55, y: 64}
+  m_SizeDelta: {x: 64, y: 55}
   m_Pivot: {x: .5, y: .5}
 --- !u!1001 &100100000
 Prefab:

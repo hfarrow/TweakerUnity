@@ -138,14 +138,12 @@ namespace Ghostbit.Tweaker.UI
 				else
 				{
 					view = controller.BaseView;
-					view.Name = view.Name + "+";
 				}
 			}
 
 			// Existing view could not be re-used or there was no existing view/controller
 			if (view == null)
 			{
-				logger.Trace("Get new tile!");
 				view = GetTileView(cell);
 				if (view == null)
 				{
@@ -176,15 +174,13 @@ namespace Ghostbit.Tweaker.UI
 
 		private TileView GetTileView(HexGridCell<BaseNode> cell)
 		{
-			logger.Trace("GetTileView: cell={0}", cell);
-
 			if (cell == null || cell.Value == null)
 			{
 				logger.Error("A cell instance must be provided for cell: {0}", cell);
 				return null;
 			}
 
-			return tileViewFactory.MakeView<TileView>(cell);
+			return tileViewFactory.MakeView<TileView>(cell, GRID_HEIGHT);
 		}
 	}
 }

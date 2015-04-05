@@ -20,9 +20,8 @@ namespace Ghostbit.Tweaker.UI
 		protected override void ConfigureView()
 		{
 			base.ConfigureView();
-			View.Name = tweakable.ShortName;
+			View.Name = TileDisplay.GetFriendlyName(tweakable.ShortName);
 			View.TileColor = Color.cyan;
-			View.FullName = tweakable.Name;
 
 			object value = tweakable.GetValue();
 

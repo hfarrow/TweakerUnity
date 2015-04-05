@@ -9,7 +9,6 @@ namespace Ghostbit.Tweaker.UI
 		public static Dictionary<string, HexGridCell<TCellValue>> MakeRectangleGrid<TCellValue>(uint width, uint height)
 			where TCellValue : class
 		{
-			var logger = LogManager.GetCurrentClassLogger();
 			// array[r][q + r/2]
 
 			var cells = new Dictionary<string, HexGridCell<TCellValue>>();
@@ -32,7 +31,6 @@ namespace Ghostbit.Tweaker.UI
 					int r = currentRow - yOffset;
 					var cell = new HexGridCell<TCellValue>(new AxialCoord(q, r), null);
 					cells.Add(cell.AxialCoord.ToString(), cell);
-					logger.Trace("Created cell at: " + cell.AxialCoord + "  (" + cell.CubeCoord + ")");
 				}
 			}
 

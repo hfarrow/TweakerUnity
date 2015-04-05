@@ -19,9 +19,8 @@ namespace Ghostbit.Tweaker.UI
 		protected override void ConfigureView()
 		{
 			base.ConfigureView();
-			View.Name = Node.ShortName;
+			View.Name = TileDisplay.GetFriendlyName(Node.ShortName);
 			View.TileColor = Color.white;
-			View.FullName = Node.FullName;
 
 			if (Node == grid.CurrentDisplayNode)
 			{

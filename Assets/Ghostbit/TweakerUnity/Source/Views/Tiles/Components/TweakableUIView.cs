@@ -10,6 +10,5 @@ namespace Ghostbit.Tweaker.UI
 	public class TweakableUIView : TileUIView
 	{
 		public Text ValueText;
-		public Text ValueLargeText;
 	}
 }

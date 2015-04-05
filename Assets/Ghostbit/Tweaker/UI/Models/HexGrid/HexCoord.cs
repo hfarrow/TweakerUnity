@@ -184,8 +184,14 @@ namespace Ghostbit.Tweaker.UI
 
 		public static Vector2 AxialToPixel(AxialCoord coord, float size)
 		{
-			float x = size * Mathf.Sqrt(3f) * ((float)coord.q + (float)coord.r / 2f);
-			float y = size * 3f / 2f * (float)coord.r;
+			// Flat Top
+			float x = size * 3f / 2f * (float)coord.q;
+			float y = size * Mathf.Sqrt(3f) * ((float)coord.r + (float)coord.q / 2f);
+
+			// Pointy Top
+			//float x = size * Mathf.Sqrt(3f) * ((float)coord.q + (float)coord.r / 2f);
+			//float y = size * 3f / 2f * (float)coord.r;
+
 			y *= -1;
 			return new Vector2(x, y);
 		}

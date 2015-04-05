@@ -20,9 +20,8 @@ namespace Ghostbit.Tweaker.UI
 		protected override void ConfigureView()
 		{
 			base.ConfigureView();
-			View.Name = watchable.ShortName;
+			View.Name = TileDisplay.GetFriendlyName(watchable.ShortName);
 			View.TileColor = Color.magenta;
-			View.FullName = watchable.Name;
 		}
 
 		protected override void ViewTapped(TileView view)

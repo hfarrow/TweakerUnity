@@ -11,7 +11,6 @@ namespace Ghostbit.Tweaker.UI
 		// Prefabs (Set by editor)
 		public TileBackgroundView BackgroundPrefab;
 		public TileUIView UIViewPrefab;
-		public FullNameView FullNamePrefab;
 
 		public event Action<TileView> Tapped;
 		public event Action<TileView> Selected;
@@ -28,7 +27,6 @@ namespace Ghostbit.Tweaker.UI
 				scale = value;
 				ui.GetComponent<RectTransform>().localScale = value;
 				background.TileImage.GetComponent<RectTransform>().localScale = value;
-				fullName.GetComponent<RectTransform>().localScale = value;
 			}
 		}
 
@@ -63,20 +61,8 @@ namespace Ghostbit.Tweaker.UI
 			set { NameText.text = value; }
 		}
 
-		public Text FullNameText
-		{
-			get { return fullName.FullNameText; }
-		}
-
-		public string FullName
-		{
-			get { return FullNameText.text; }
-			set { FullNameText.text = value; }
-		}
-
 		protected TileBackgroundView background;
 		protected TileUIView ui;
-		protected FullNameView fullName;
 		protected Vector2 scale;
 
 		protected ITweakerLogger logger = LogManager.GetCurrentClassLogger();
@@ -84,7 +70,6 @@ namespace Ghostbit.Tweaker.UI
 		public void Awake()
 		{
 			InstatiatePrefabs();
-			ShowFullName(false);
 
 			// Hit area must be the top most child of the entire tile (not just the background view).
 			ParentToThis(background.HitAreaImage);
@@ -124,7 +109,6 @@ namespace Ghostbit.Tweaker.UI
 		{
 			background = InstantiateTileComponent(BackgroundPrefab);
 			ui = InstantiateTileComponent(UIViewPrefab);
-			fullName = InstantiateTileComponent(FullNamePrefab);
 		}
 
 		private TComponent InstantiateTileComponent<TComponent>(TComponent prefab)
@@ -150,7 +134,6 @@ namespace Ghostbit.Tweaker.UI
 
 		public virtual void OnSelected(TileBackgroundView defaultView)
 		{
-			ShowFullName(true);
 			if (Selected != null)
 			{
 				Selected(this);
@@ -159,7 +142,6 @@ namespace Ghostbit.Tweaker.UI
 
 		public virtual void OnDeselected(TileBackgroundView defaultView)
 		{
-			ShowFullName(false);
 			if (Deselected != null)
 			{
 				Deselected(this);
@@ -174,12 +156,6 @@ namespace Ghostbit.Tweaker.UI
 		public void ShowError()
 		{
 			TileColor = errorColor;
-		}
-
-		private void ShowFullName(bool show)
-		{
-			fullName.gameObject.SetActive(show);
-			ui.NameText.gameObject.SetActive(!show);
 		}
 	}
 }

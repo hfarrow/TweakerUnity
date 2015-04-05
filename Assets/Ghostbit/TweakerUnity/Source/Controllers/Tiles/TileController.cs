@@ -58,7 +58,6 @@ namespace Ghostbit.Tweaker.UI
 			{
 				View.TileAlpha = 0.6f;
 				View.Name = "<Unknown Type>";
-				View.FullName = "<Unknown Type>";
 			}
 			else
 			{

@@ -27,12 +27,10 @@ namespace Ghostbit.Tweaker.UI
 			{
 				const string name = "Invoke";
 				View.Name = name;
-				View.FullName = name;
 			}
 			else
 			{
-				View.Name = invokable.ShortName;
-				View.FullName = invokable.Name;
+				View.Name = TileDisplay.GetFriendlyName(invokable.ShortName);
 			}
 
 			if (grid.CurrentDisplayNode == Node)
@@ -49,7 +47,7 @@ namespace Ghostbit.Tweaker.UI
 
 		protected override void ViewTapped(TileView view)
 		{
-			logger.Trace("Invokable was tapped: {0}", View.FullName);
+			logger.Trace("Invokable was tapped: {0}", View.Name);
 
 			if (Node == grid.CurrentDisplayNode)
 			{
