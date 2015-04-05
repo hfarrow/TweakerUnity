@@ -41,8 +41,10 @@ namespace Ghostbit.Tweaker.UI
 		protected override void ViewTapped(TileView view)
 		{
 			logger.Trace("Invokable was tapped: {0}", View.FullName);
+
 			if (Node == grid.CurrentDisplayNode)
 			{
+				// Go up one level to parent view
 				if (Node.Parent != null)
 				{
 					grid.DisplayNode(Node.Parent);
@@ -52,15 +54,12 @@ namespace Ghostbit.Tweaker.UI
 			{
 				if (invokable == null && grid.CurrentDisplayNode.Type == UI.BaseNode.NodeType.Invokable)
 				{
+					// This is an "Invoke" node that displays args as tweakable.
 					var parentInvokableNode = grid.CurrentDisplayNode as InvokableNode;
 					try
 					{
 						parentInvokableNode.Invoke();
 						view.ShowSuccess();
-						if (parentInvokableNode.Parent != null)
-						{
-							grid.DisplayNode(parentInvokableNode.Parent);
-						}
 					}
 					catch(Exception ex)
 					{
@@ -70,7 +69,9 @@ namespace Ghostbit.Tweaker.UI
 				}
 				else
 				{
+					// All invokables can be displayed as a group of tweakables.
 					grid.DisplayNode(Node);
+					grid.Console.ShowInspector(Node);
 				}
 			}
 		}

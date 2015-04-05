@@ -29,7 +29,7 @@ namespace Ghostbit.Tweaker.UI
 
 			view.Header.TypeText.text = Tweakable.TweakableType.FullName;
 
-			foreach(IInspectorContentView contentView in contentFactory.MakeContentViews(Tweakable))
+			foreach(IInspectorContentView contentView in MakeContentViews(Tweakable))
 			{
 				if (contentView != null)
 				{
@@ -39,6 +39,39 @@ namespace Ghostbit.Tweaker.UI
 				{
 					view.Header.TypeText.text = "[Unsupported] " + Tweakable.TweakableType.FullName;
 				}
+			}
+		}
+
+		private IEnumerable<IInspectorContentView> MakeContentViews(ITweakable tweakable)
+		{
+			yield return contentFactory.MakeDescriptionView(tweakable.Description);
+
+			if (tweakable.HasToggle)
+			{
+				// TODO: show toggles
+			}
+			else if (tweakable.TweakableType.IsEnum)
+			{
+				// TODO: show enum values (same view as toggles);
+			}
+			else if (tweakable.TweakableType == typeof(string))
+			{
+				yield return contentFactory.MakeEditStringView(tweakable);
+			}
+			else if (tweakable.TweakableType == typeof(bool))
+			{
+				yield return contentFactory.MakeEditBoolView(tweakable);
+			}
+			else if (tweakable.TweakableType.IsNumericType())
+			{
+				yield return contentFactory.MakeEditNumericView(tweakable);
+				// TODO: Show constraints as slider
+				// TODO: show stepper if tweakable.IsStep
+			}
+			else
+			{
+				yield return null;
+				// TODO: use input text and attempt json deserialization to tweakable.TweakableType
 			}
 		}
 

@@ -201,9 +201,10 @@ namespace Ghostbit.Tweaker.Core.Tests
 
 			var name = "TestEventVoidVoid";
 			var assembly = testClass.GetType().Assembly;
+			var eventInfo = testClass.GetType().GetEvent(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 			var fieldInfo = testClass.GetType().GetField(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 			Assert.IsNotNull(fieldInfo);
-			var invokable = new InvokableEvent(new InvokableInfo(name), fieldInfo, new WeakReference(testClass));
+			var invokable = new InvokableEvent(new InvokableInfo(name), eventInfo, fieldInfo, new WeakReference(testClass));
 
 			Assert.AreEqual(name, invokable.Name);
 			Assert.AreEqual(assembly, invokable.Assembly);
@@ -220,8 +221,9 @@ namespace Ghostbit.Tweaker.Core.Tests
 
 			var name = "TestEventVoidVoid";
 			var assembly = testClass.GetType().Assembly;
+			var eventInfo = testClass.GetType().GetEvent(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 			var fieldInfo = testClass.GetType().GetField(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-			var invokable = new InvokableEvent(new InvokableInfo(name), fieldInfo, new WeakReference(testClass));
+			var invokable = new InvokableEvent(new InvokableInfo(name), eventInfo, fieldInfo, new WeakReference(testClass));
 
 			invokable.Invoke();
 			Assert.IsTrue(lambdaDidRun);

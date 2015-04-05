@@ -9,16 +9,18 @@ namespace Ghostbit.Tweaker.UI
 	{
 		public InspectorBackgroundView BackgroundPrefab;
 		public InspectorHeaderView HeaderPrefab;
+		public InspectorFooterView FooterPrefab;
 		public InspectorStringView StringEditPrefab;
 		public InspectorStringView StringSmallEditPrefab;
 		public InspectorBoolView BoolEditPrefab;
+		public InspectorDescriptionView DescriptionPrefab;
 
-		public GameObject HeaderContainer;
 		public GameObject ContentContainer;
-		public GameObject BackgroundContainer;
+		public GameObject BodyContainer;
 
 		public InspectorBackgroundView Background { get; private set; }
 		public InspectorHeaderView Header { get; private set; }
+		public InspectorFooterView Footer { get; private set; }
 
 		public void Awake()
 		{
@@ -38,9 +40,13 @@ namespace Ghostbit.Tweaker.UI
 
 		private void InstatiatePrefabs()
 		{
-			// Order matters: Back layer to front layer
-			Background = InstantiateInspectorComponent(BackgroundPrefab, BackgroundContainer);
-			Header = InstantiateInspectorComponent(HeaderPrefab, HeaderContainer);
+			Background = InstantiateInspectorComponent(BackgroundPrefab, gameObject);
+			Header = InstantiateInspectorComponent(HeaderPrefab, ContentContainer);
+			Footer = InstantiateInspectorComponent(FooterPrefab, ContentContainer);
+
+			Header.GetComponent<RectTransform>().SetAsFirstSibling();
+			Footer.GetComponent<RectTransform>().SetAsLastSibling();
+			Background.GetComponent<RectTransform>().SetAsFirstSibling();
 		}
 
 		public TComponent InstantiateInspectorComponent<TComponent>(TComponent prefab, GameObject parent = null)
@@ -49,7 +55,7 @@ namespace Ghostbit.Tweaker.UI
 			var component = Instantiate(prefab) as TComponent;
 			if(parent == null)
 			{
-				parent = ContentContainer;
+				parent = BodyContainer;
 			}
 			SetComponentParent(component, parent);
 			return component;

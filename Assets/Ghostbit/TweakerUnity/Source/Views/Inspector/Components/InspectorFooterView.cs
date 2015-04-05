@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 namespace Ghostbit.Tweaker.UI
 {
-	public class InspectorBackgroundView : MonoBehaviour
+	public class InspectorFooterView : MonoBehaviour
 	{
-		public Image BackgroundImage;
+		public Button CloseButton;
 	}
 }

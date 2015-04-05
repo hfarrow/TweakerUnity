@@ -77,16 +77,16 @@ namespace Ghostbit.Tweaker.UI
 				Closed = null;
 			}
 
-			view.Background.DoneButton.onClick.RemoveAllListeners();
+			view.Footer.CloseButton.onClick.RemoveAllListeners();
 			view.DestroySelf();
 		}
 
 		protected virtual void ConfigureViews()
 		{
-			view.Background.DoneButton.onClick.AddListener(DoneClicked);
+			view.Footer.CloseButton.onClick.AddListener(CloseClicked);
 		}
 
-		private void DoneClicked()
+		private void CloseClicked()
 		{
 			Destroy();
 		}

@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 using Ghostbit.Tweaker.Core;
+using System;
 
 public class ExampleNodes
 {
 	#region Root
-	[Tweakable("MyString")]
+	[Tweakable("MyString", Description="A test string. Try changing the value!")]
 	public static string root_string = "root string value";
 
 	[Tweakable("MyBoolean")]
@@ -19,12 +20,15 @@ public class ExampleNodes
 
 	[Invokable("MyCommand", Description="This is a test command with args and void return type.")]
 	public static void root_command(
-		[ArgDescription("int arg1")] int arg1,
-		[ArgDescription("int arg1")] string arg2,
-		[ArgDescription("int arg1")] bool arg3)
+		[ArgDescription("some random integer")] int arg1,
+		[ArgDescription("some random string")] string arg2,
+		[ArgDescription("some random bool")] bool arg3)
 	{
 		LogManager.GetCurrentClassLogger().Trace("root_command invoked: {0}, {1}, {2}", arg1, arg2, arg3);
 	}
+
+	[Invokable("MyEvent", Description="This is a test event with args. There are no listeners.")]
+	public static event Action<int, string> root_event;
 
 	#region Group Dog
 	[Tweakable("Dog.Name")]
@@ -123,4 +127,14 @@ public class ExampleNodes
 	public static int test_value = 99999;
 
 	#endregion // Root
+
+	static ExampleNodes()
+	{
+		root_event += on_root_event;
+	}
+
+	static void on_root_event(int arg1, string arg2)
+	{
+		LogManager.GetCurrentClassLogger().Trace("root_event invoked: {0}, {1}", arg1, arg2);
+	}
 }

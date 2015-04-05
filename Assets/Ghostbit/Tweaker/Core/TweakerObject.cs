@@ -49,6 +49,11 @@ namespace Ghostbit.Tweaker.Core
 		private string shortName;
 
 		/// <summary>
+		/// Get the description for this tweakable object.
+		/// </summary>
+		public string Description { get { return Info.Description; } }
+
+		/// <summary>
 		/// The name that this tweaker object registers with.
 		/// </summary>
 		public string Name

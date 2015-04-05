@@ -14,7 +14,7 @@ namespace Ghostbit.Tweaker.UI
 			switch (type)
 			{
 				case BaseNode.NodeType.Invokable:
-					//controller = new InvokableTileController(console, view, cell);
+					controller = new InvokableInspectorController(view, grid);
 					break;
 
 				case BaseNode.NodeType.Tweakable:

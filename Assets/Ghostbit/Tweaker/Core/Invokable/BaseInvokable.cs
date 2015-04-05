@@ -7,15 +7,25 @@ namespace Ghostbit.Tweaker.Core
 	public abstract class BaseInvokable : TweakerObject, IInvokable
 	{
 		public InvokableInfo InvokableInfo { get; private set; }
-
 		public IInvokableManager Manager { get; set; }
+
+		public abstract string MethodSignature { get; }
 
 		private Type[] argTypes;
 		public Type[] ArgTypes
 		{
 			get
 			{
-				return argTypes.Clone() as Type[];
+				Type[] clone;
+				if (argTypes != null)
+				{
+					clone = argTypes.Clone() as Type[];
+				}
+				else
+				{
+					clone = new Type[0];
+				}
+				return clone;
 			}
 		}
 
@@ -64,6 +74,12 @@ namespace Ghostbit.Tweaker.Core
 
 		private void CheckArgsAreValid(object[] args)
 		{
+			if (argTypes == null)
+			{
+				// SetParameters was never called. Skip validation.
+				return;
+			}
+
 			if (args == null)
 			{
 				args = new object[0];

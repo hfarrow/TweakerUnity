@@ -11,6 +11,11 @@ namespace Ghostbit.Tweaker.Core
 	public interface ITweakerObject
 	{
 		/// <summary>
+		/// Get the description for this tweakable object.
+		/// </summary>
+		string Description { get; }
+
+		/// <summary>
 		/// The name that this tweaker object registers with.
 		/// </summary>
 		string Name { get; }

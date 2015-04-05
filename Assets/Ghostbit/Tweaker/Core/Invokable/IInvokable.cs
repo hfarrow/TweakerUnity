@@ -16,6 +16,11 @@ namespace Ghostbit.Tweaker.Core
 		InvokableInfo InvokableInfo { get; }
 
 		/// <summary>
+		/// Get the call signature of the method. ie: "void (int, string)"
+		/// </summary>
+		string MethodSignature { get; }
+
+		/// <summary>
 		/// Get the type of each argument this invokable requires when invoked.
 		/// </summary>
 		Type[] ArgTypes { get; }
@@ -27,8 +32,6 @@ namespace Ghostbit.Tweaker.Core
 		/// <param name="args">Arguments to invoke with.</param>
 		/// <returns>The return value of the invokable.</returns>
 		object Invoke(params object[] args);
-
-		//object InvokeWithArgArray(object[])
 
 		/// <summary>
 		/// The manager that this invokable is registered to.

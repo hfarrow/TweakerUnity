@@ -18,38 +18,7 @@ namespace Ghostbit.Tweaker.UI
 			successColor = inspectorView.StringSmallEditPrefab.InputText.targetGraphic.color;
 		}
 
-		public IEnumerable<IInspectorContentView> MakeContentViews(ITweakable tweakable)
-		{
-			if (tweakable.HasToggle)
-			{
-				// TODO: show toggles
-			}
-			else if (tweakable.TweakableType.IsEnum)
-			{
-				// TODO: show enum values (same view as toggles);
-			}
-			else if (tweakable.TweakableType == typeof(string))
-			{
-				yield return MakeEditStringView(tweakable);
-			}
-			else if(tweakable.TweakableType == typeof(bool))
-			{
-				yield return MakeEditBoolView(tweakable);
-			}
-			else if(tweakable.TweakableType.IsNumericType())
-			{
-				yield return MakeEditNumericView(tweakable);
-				// TODO: Show constraints as slider
-				// TODO: show stepper if tweakable.IsStep
-			}
-			else
-			{
-				yield return null;
-				// TODO: use input text and attempt json deserialization to tweakable.TweakableType
-			}
-		}
-
-		public IInspectorContentView MakeEditStringView(ITweakable tweakable)
+		public InspectorStringView MakeEditStringView(ITweakable tweakable)
 		{
 			InspectorStringView stringView = inspectorView.InstantiateInspectorComponent(inspectorView.StringEditPrefab);
 			stringView.InputText.targetGraphic.color = successColor;
@@ -72,7 +41,7 @@ namespace Ghostbit.Tweaker.UI
 			return stringView;
 		}
 
-		public IInspectorContentView MakeEditNumericView(ITweakable tweakable)
+		public InspectorStringView MakeEditNumericView(ITweakable tweakable)
 		{
 			InspectorStringView stringView = inspectorView.InstantiateInspectorComponent(inspectorView.StringSmallEditPrefab);
 			stringView.InputText.text = tweakable.GetValue().ToString();
@@ -130,7 +99,7 @@ namespace Ghostbit.Tweaker.UI
 			return stringView;
 		}
 
-		public IInspectorContentView MakeEditBoolView(ITweakable tweakable)
+		public InspectorBoolView MakeEditBoolView(ITweakable tweakable)
 		{
 			InspectorBoolView boolView = inspectorView.InstantiateInspectorComponent(inspectorView.BoolEditPrefab);
 			bool value = (bool)tweakable.GetValue();
@@ -143,6 +112,20 @@ namespace Ghostbit.Tweaker.UI
 			};
 			boolView.gameObject.SetActive(true);
 			return boolView;
+		}
+
+		public InspectorDescriptionView MakeDescriptionView(string description)
+		{
+			InspectorDescriptionView descriptionView = inspectorView.InstantiateInspectorComponent(inspectorView.DescriptionPrefab);
+			if (string.IsNullOrEmpty(description))
+			{
+				descriptionView.DescriptionText.text = "[No Description]";
+			}
+			else
+			{
+				descriptionView.DescriptionText.text = description;
+			}
+			return descriptionView;
 		}
 	}
 }

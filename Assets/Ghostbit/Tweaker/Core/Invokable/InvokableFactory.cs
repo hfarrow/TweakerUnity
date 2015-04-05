@@ -49,13 +49,14 @@ namespace Ghostbit.Tweaker.Core
 		public static IInvokable MakeInvokable(InvokableInfo info, EventInfo eventInfo, object instance)
 		{
 			FieldInfo fieldInfo = GetBackingEventField(eventInfo, instance);
-			return MakeInvokableFromBackingEventField(info, fieldInfo, instance);
+			return MakeInvokableFromBackingEventField(info, eventInfo, fieldInfo, instance);
 		}
 
-		public static IInvokable MakeInvokableFromBackingEventField(InvokableInfo info, FieldInfo fieldInfo, object instance)
+		public static IInvokable MakeInvokableFromBackingEventField(InvokableInfo info, EventInfo eventInfo, FieldInfo fieldInfo, object instance)
 		{
 			return new InvokableEvent(
 				info,
+				eventInfo,
 				fieldInfo,
 				instance == null ? null : new WeakReference(instance));
 		}

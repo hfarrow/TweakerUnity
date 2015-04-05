@@ -33,7 +33,7 @@ namespace Ghostbit.Tweaker.Core
 	public class InvokeException : Exception, ISerializable
 	{
 		public InvokeException(string name, object[] args, Exception inner)
-			: base("Invocation of '" + name + "(" + args + ")' failed. See inner exception.", inner)
+			: base("Invocation of '" + name + "(" + args + ")' failed. Inner Exception: " + inner.Message, inner)
 		{
 		}
 	}
