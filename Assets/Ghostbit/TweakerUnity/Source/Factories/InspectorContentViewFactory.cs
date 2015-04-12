@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Ghostbit.Tweaker.Core;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Ghostbit.Tweaker.UI
 {
@@ -16,6 +17,20 @@ namespace Ghostbit.Tweaker.UI
 		{
 			this.inspectorView = inspectorView;
 			successColor = inspectorView.StringSmallEditPrefab.InputText.targetGraphic.color;
+		}
+
+		public InspectorDescriptionView MakeDescriptionView(string description)
+		{
+			InspectorDescriptionView descriptionView = inspectorView.InstantiateInspectorComponent(inspectorView.DescriptionPrefab);
+			if (string.IsNullOrEmpty(description))
+			{
+				descriptionView.DescriptionText.text = "[No Description]";
+			}
+			else
+			{
+				descriptionView.DescriptionText.text = description;
+			}
+			return descriptionView;
 		}
 
 		public InspectorStringView MakeEditStringView(ITweakable tweakable)
@@ -37,6 +52,12 @@ namespace Ghostbit.Tweaker.UI
 			{
 				tweakable.SetValue(newValue);
 			};
+
+			tweakable.ValueChanged += (oldValue, newValue) =>
+			{
+				stringView.InputText.text = newValue.ToString();
+			};
+
 			stringView.gameObject.SetActive(true);
 			return stringView;
 		}
@@ -95,6 +116,12 @@ namespace Ghostbit.Tweaker.UI
 					}
 				}
 			};
+
+			tweakable.ValueChanged += (oldValue, newValue) =>
+			{
+				stringView.InputText.text = newValue.ToString();
+			};
+
 			stringView.gameObject.SetActive(true);
 			return stringView;
 		}
@@ -110,22 +137,113 @@ namespace Ghostbit.Tweaker.UI
 				tweakable.SetValue(newValue);
 				boolView.ToggleText.text = newValue.ToString();
 			};
+
+			tweakable.ValueChanged += (oldValue, newValue) =>
+			{
+				boolView.Toggle.isOn = (bool)newValue;
+				boolView.ToggleText.text = newValue.ToString();
+			};
+
 			boolView.gameObject.SetActive(true);
 			return boolView;
 		}
 
-		public InspectorDescriptionView MakeDescriptionView(string description)
+		public InspectorStepperView MakeStepperView(ITweakable tweakable)
 		{
-			InspectorDescriptionView descriptionView = inspectorView.InstantiateInspectorComponent(inspectorView.DescriptionPrefab);
-			if (string.IsNullOrEmpty(description))
+			InspectorStepperView stepperView = inspectorView.InstantiateInspectorComponent(inspectorView.StepperPrefab);
+			stepperView.NextClicked += () =>
 			{
-				descriptionView.DescriptionText.text = "[No Description]";
+				if (tweakable.HasStep)
+				{
+					IStepTweakable stepper = tweakable.Step;
+					stepper.StepNext();
+				}
+			};
+
+			stepperView.PrevClicked += () =>
+			{
+				if (tweakable.HasStep)
+				{
+					IStepTweakable stepper = tweakable.Step;
+					stepper.StepPrevious();
+				}
+			};
+
+			return stepperView;
+		}
+
+		public InspectorToggleGroupView MakeToggleGroupView()
+		{
+			InspectorToggleGroupView groupView = inspectorView.InstantiateInspectorComponent(inspectorView.ToggleGroupPrefab);
+			return groupView;
+		}
+
+		public InspectorToggleValueView MakeToggleValueView(ITweakable tweakable, IToggleTweakable toggleTweakable, int toggleIndex, ToggleGroup group)
+		{
+			InspectorToggleValueView valueView = inspectorView.InstantiateInspectorComponent(inspectorView.ToggleValuePrefab);
+			valueView.Toggle.group = group;
+			valueView.Toggle.isOn = toggleTweakable.CurrentIndex == toggleIndex;
+			valueView.ToggleText.text = toggleTweakable.GetNameByIndex(toggleIndex);
+
+			tweakable.ValueChanged += (oldValue, newValue) =>
+			{
+				if(toggleTweakable.CurrentIndex == toggleIndex && !valueView.Toggle.isOn)
+				{
+					valueView.Toggle.isOn = true;
+				}
+			};
+
+			valueView.Toggle.onValueChanged.AddListener((isOn) =>
+			{
+				if(isOn && toggleIndex != toggleTweakable.CurrentIndex)
+				{
+					toggleTweakable.SetValueByName(toggleTweakable.GetNameByIndex(toggleIndex));
+				}
+			});
+
+			return valueView;
+		}
+
+		public InspectorSliderView MakeSliderView(ITweakable tweakable)
+		{
+			InspectorSliderView sliderView = inspectorView.InstantiateInspectorComponent(inspectorView.SliderPrefab);
+
+			Type tweakableType = tweakable.TweakableType;
+			if(!tweakableType.IsNumericType())
+			{
+				// Cannot show a slider for non numeric types.
+				return null;
+			}
+
+			if(tweakableType == typeof(int) ||
+				tweakableType == typeof(uint) ||
+				tweakableType == typeof(Int64) ||
+				tweakableType == typeof(UInt64) ||
+				tweakableType == typeof(Int16) ||
+				tweakableType == typeof(UInt16))
+			{
+				sliderView.Slider.wholeNumbers = true;
 			}
 			else
 			{
-				descriptionView.DescriptionText.text = description;
+				sliderView.Slider.wholeNumbers = false;
 			}
-			return descriptionView;
+
+			sliderView.Slider.minValue = (float)tweakable.MinValue;
+			sliderView.Slider.maxValue = (float)tweakable.MaxValue;
+			sliderView.Slider.value = (float)tweakable.GetValue();
+
+			sliderView.ValueChanged += (newValue) =>
+			{
+				tweakable.SetValue(newValue);
+			};
+
+			tweakable.ValueChanged += (oldValue, newValue) =>
+			{
+				sliderView.Slider.value = (float)newValue;
+			};
+
+			return sliderView;
 		}
 	}
 }

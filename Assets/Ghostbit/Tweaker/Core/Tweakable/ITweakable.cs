@@ -75,6 +75,16 @@ namespace Ghostbit.Tweaker.Core
 		/// null if this tweakable is not toggable.
 		/// </summary>
 		IToggleTweakable Toggle { get; }
+
+		/// <summary>
+		/// The minimum value of this tweakable or null if it does not have a minimum value defined.
+		/// </summary>
+		object MinValue { get; }
+
+		/// <summary>
+		/// the maximum value of this tweakable or null if it does not have a minimum value defined.
+		/// </summary>
+		object MaxValue { get; }
 	}
 
 	/// <summary>
@@ -116,6 +126,11 @@ namespace Ghostbit.Tweaker.Core
 		/// The current value index of the toggle.
 		/// </summary>
 		int CurrentIndex { get; }
+
+		/// <summary>
+		/// The number of values contained by the toggle.
+		/// </summary>
+		int ToggleCount { get; }
 
 		/// <summary>
 		/// Get the index for the specified value.

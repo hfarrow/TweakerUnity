@@ -9,11 +9,15 @@ namespace Ghostbit.Tweaker.UI
 	{
 		public InspectorBackgroundView BackgroundPrefab;
 		public InspectorHeaderView HeaderPrefab;
+		public InspectorDescriptionView DescriptionPrefab;
 		public InspectorFooterView FooterPrefab;
 		public InspectorStringView StringEditPrefab;
 		public InspectorStringView StringSmallEditPrefab;
 		public InspectorBoolView BoolEditPrefab;
-		public InspectorDescriptionView DescriptionPrefab;
+		public InspectorStepperView StepperPrefab;
+		public InspectorToggleGroupView ToggleGroupPrefab;
+		public InspectorToggleValueView ToggleValuePrefab;
+		public InspectorSliderView SliderPrefab;
 
 		public GameObject ContentContainer;
 		public GameObject BodyContainer;
@@ -42,7 +46,7 @@ namespace Ghostbit.Tweaker.UI
 		{
 			Background = InstantiateInspectorComponent(BackgroundPrefab, gameObject);
 			Header = InstantiateInspectorComponent(HeaderPrefab, ContentContainer);
-			Footer = InstantiateInspectorComponent(FooterPrefab, ContentContainer);
+			Footer = InstantiateInspectorComponent(FooterPrefab, gameObject);
 
 			Header.GetComponent<RectTransform>().SetAsFirstSibling();
 			Footer.GetComponent<RectTransform>().SetAsLastSibling();

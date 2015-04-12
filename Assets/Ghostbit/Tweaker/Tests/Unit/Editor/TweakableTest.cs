@@ -212,9 +212,9 @@ namespace Ghostbit.Tweaker.Core.Tests
 			ToggleTweakable<int> toggle = toggleInterface as ToggleTweakable<int>;
 			Assert.IsNotNull(toggle);
 			ValidateBaseTweakable(tweakable, getter);
+			toggle.SetValueByName(toggle.GetNameByIndex(0));
 
-			Assert.AreEqual(-1, toggle.CurrentIndex);
-			Assert.AreEqual(0, toggle.StepNext());
+			Assert.AreEqual(toggle.GetIndexOfValue(getter()), toggle.CurrentIndex);
 			Assert.AreEqual(0, toggle.CurrentIndex);
 			Assert.AreEqual(0, getter());
 			Assert.AreEqual("zero", toggle.GetValueName());

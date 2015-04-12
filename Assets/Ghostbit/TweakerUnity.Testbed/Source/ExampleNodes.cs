@@ -5,6 +5,14 @@ using System;
 
 public class ExampleNodes
 {
+	public enum TestEnum
+	{
+		VALUE_A = 0,
+		VALUE_B = 1,
+		VALUE_C = 2,
+		VALUE_D = 3
+	}
+
 	#region Root
 	[Tweakable("MyString", Description="A test string. Try changing the value!")]
 	public static string root_string = "root string value";
@@ -12,10 +20,17 @@ public class ExampleNodes
 	[Tweakable("MyBoolean")]
 	public static bool root_bool = false;
 
-	[Tweakable("MyInteger")]
-	public static int root_int = 1;
+	[Tweakable("MyInteger"),
+	 NamedToggleValue("zero", 0, 0),
+	 NamedToggleValue("eleven", 11, 1),
+	 NamedToggleValue("hundred", 100, 2),
+	 NamedToggleValue("leet", 1337, 3),
+	 NamedToggleValue("lucky", 7, 4)]
+	public static int root_int = 0;
 
 	[Tweakable("MyFloat")]
+	[StepSize(1.5f)]
+	[Ghostbit.Tweaker.Core.RangeAttribute(1.0f, 200f)]
 	public static float root_float = 1.0f;
 
 	[Invokable("MyCommand", Description="This is a test command with args and void return type.")]
@@ -29,6 +44,9 @@ public class ExampleNodes
 
 	[Invokable("MyEvent", Description="This is a test event with args. There are no listeners.")]
 	public static event Action<int, string> root_event;
+
+	[Tweakable("MyEnum")]
+	public static TestEnum root_enum = TestEnum.VALUE_A;
 
 	#region Group Dog
 	[Tweakable("Dog.Name")]
