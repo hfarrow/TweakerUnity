@@ -25,7 +25,11 @@ public class ExampleNodes
 	 NamedToggleValue("eleven", 11, 1),
 	 NamedToggleValue("hundred", 100, 2),
 	 NamedToggleValue("leet", 1337, 3),
-	 NamedToggleValue("lucky", 7, 4)]
+	 NamedToggleValue("lucky", 7, 4),
+	 NamedToggleValue("pie", 8, 5),
+	 NamedToggleValue("apple", 9, 6),
+	 NamedToggleValue("donut", 10, 7),
+	 NamedToggleValue("eagle", 11, 8)]
 	public static int root_int = 0;
 
 	[Tweakable("MyFloat")]
@@ -121,6 +125,102 @@ public class ExampleNodes
 
 	[Tweakable("Dog.Toys.Placeholder17")]
 	public static string dog_toys_placeholder17 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder18")]
+	public static string dog_toys_placeholder18 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder19")]
+	public static string dog_toys_placeholder19 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder20")]
+	public static string dog_toys_placeholder20 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder21")]
+	public static string dog_toys_placeholder21 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder22")]
+	public static string dog_toys_placeholder22 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder23")]
+	public static string dog_toys_placeholder23 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder24")]
+	public static string dog_toys_placeholder24 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder25")]
+	public static string dog_toys_placeholder25 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder26")]
+	public static string dog_toys_placeholder26 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder27")]
+	public static string dog_toys_placeholder27 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder28")]
+	public static string dog_toys_placeholder28 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder29")]
+	public static string dog_toys_placeholder29 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder30")]
+	public static string dog_toys_placeholder30 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder31")]
+	public static string dog_toys_placeholder31 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder32")]
+	public static string dog_toys_placeholder32 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder33")]
+	public static string dog_toys_placeholder33 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder34")]
+	public static string dog_toys_placeholder34 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder35")]
+	public static string dog_toys_placeholder35 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder36")]
+	public static string dog_toys_placeholder36 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder37")]
+	public static string dog_toys_placeholder37 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder38")]
+	public static string dog_toys_placeholder38 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder39")]
+	public static string dog_toys_placeholder39 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder40")]
+	public static string dog_toys_placeholder40 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder41")]
+	public static string dog_toys_placeholder41 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder42")]
+	public static string dog_toys_placeholder42 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder43")]
+	public static string dog_toys_placeholder43 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder44")]
+	public static string dog_toys_placeholder44 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder45")]
+	public static string dog_toys_placeholder45 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder46")]
+	public static string dog_toys_placeholder46 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder47")]
+	public static string dog_toys_placeholder47 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder48")]
+	public static string dog_toys_placeholder48 = "placeholder";
+
+	[Tweakable("Dog.Toys.Placeholder49")]
+	public static string dog_toys_placeholder49 = "placeholder";
 
 	[Invokable("Dog.Toys.PlayWithToys")]
 	public static void dog_toys_playWithToys(string toysToPlayWith)

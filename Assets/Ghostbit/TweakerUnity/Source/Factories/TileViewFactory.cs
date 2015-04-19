@@ -25,7 +25,7 @@ namespace Ghostbit.Tweaker.UI
 			this.tileContainer = tileContainer;
 		}
 
-		public TView MakeView<TView>(HexGridCell<BaseNode> cell, uint gridHeight)
+		public TView MakeView<TView>(HexGridCell<BaseNode> cell, uint gridWidth, uint gridHeight)
 			where TView : TileView
 		{
 			TileView viewPrefab;
@@ -47,15 +47,25 @@ namespace Ghostbit.Tweaker.UI
 			view.name = cell.AxialCoord.ToString();
 			view.gameObject.SetActive(true);
 
-			// This assumes we are using flat top hexagons
+			// This assumes we are using flat top hexagons and that we want to fit the grid to the screen size.
 			float tileHeight = (float)Screen.height / (float)(gridHeight + 1);
 			float tileWidth = tileHeight / (Mathf.Sqrt(3f) / 2f);
 			float tileSize = tileWidth / 2f;
 
 			Vector2 position = HexCoord.AxialToPixel(cell.AxialCoord, tileSize);
 
-			// Offset the position slighlty so that rectangle hex grid looks more centered in the screen.
-			position.y += tileSize / 2f;
+			// Offset the position so that rectangle hex grid looks more centered in the screen.
+			// The direction to offset depends on the grid width because the height of each
+			// column is different based on being an even numbered column or not.
+			float yOffset = tileHeight / 4f;
+			if(gridWidth % 2 == 0)
+			{
+				position.y -= yOffset;
+			}
+			else
+			{
+				position.y += yOffset;
+			}
 
 			viewTransform.anchoredPosition = position;
 			viewTransform.sizeDelta = new Vector2(tileWidth, tileHeight);

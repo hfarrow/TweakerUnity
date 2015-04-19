@@ -158,22 +158,30 @@ namespace Ghostbit.Tweaker.UI
 	{
 		public static void CubeToAxial(ref CubeCoord coord, out AxialCoord outCoord)
 		{
-			outCoord =  new AxialCoord(coord.x, coord.z);
+			outCoord =  new AxialCoord(coord.x, coord.y);
+			//outCoord = new AxialCoord(coord.x, coord.z);
+			//outCoord = new AxialCoord(coord.y, coord.z);
 		}
 
 		public static AxialCoord CubeToAxial(CubeCoord coord)
 		{
-			return new AxialCoord(coord.x, coord.z);
+			return new AxialCoord(coord.x, coord.y);
+			//return new AxialCoord(coord.x, coord.z);
+			//return new AxialCoord(coord.y, coord.z);
 		}
 
 		public static void AxialToCube(ref AxialCoord coord, out CubeCoord outCoord)
 		{
-			outCoord = new CubeCoord(coord.q, -coord.q - coord.r, coord.r);
+			outCoord = new CubeCoord(coord.q, coord.r, -coord.q - coord.r);
+			//outCoord = new CubeCoord(coord.q, -coord.q - coord.r, coord.r);
+			//outCoord = new CubeCoord(-coord.q - coord.r, coord.q, coord.r);
 		}
 
 		public static CubeCoord AxialToCube(AxialCoord coord)
 		{
-			return new CubeCoord(coord.q, -coord.q - coord.r, coord.r);
+			return new CubeCoord(coord.q, coord.r, -coord.q - coord.r);
+			//return new CubeCoord(coord.q, -coord.q - coord.r, coord.r);
+			//return new CubeCoord(-coord.q - coord.r, coord.q, coord.r);
 		}
 
 		public static Vector2 AxialToPixel(CubeCoord coord, float size)
@@ -192,7 +200,7 @@ namespace Ghostbit.Tweaker.UI
 			//float x = size * Mathf.Sqrt(3f) * ((float)coord.q + (float)coord.r / 2f);
 			//float y = size * 3f / 2f * (float)coord.r;
 
-			y *= -1;
+			//y *= -1;
 			return new Vector2(x, y);
 		}
 

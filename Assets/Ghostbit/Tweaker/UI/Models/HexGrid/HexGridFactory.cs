@@ -9,14 +9,16 @@ namespace Ghostbit.Tweaker.UI
 		public static Dictionary<string, HexGridCell<TCellValue>> MakeRectangleGrid<TCellValue>(uint width, uint height)
 			where TCellValue : class
 		{
-			// array[r][q + r/2]
+			// array[q][r + q/2]
 
 			var cells = new Dictionary<string, HexGridCell<TCellValue>>();
 
 			// Offsets are to make (0,0) the center of the grid because
 			// the grid is generated with (0,0) at the top left.
-			int xOffset = (int)width / 2 - 1;
-			int yOffset = (int)height / 2;
+			int xOffset = (int)width / 2;
+			//int yOffset = (int)height;
+			//int xOffset = 0;
+			int yOffset = 0;
 
 			for (int currentRow = 0; currentRow < height; currentRow++)
 			{
@@ -24,12 +26,12 @@ namespace Ghostbit.Tweaker.UI
 				{
 					// See http://www.redblobgames.com/grids/hexagons/#map-storage for how this logic
 					// was derived.
-					// Every other row in the grid adds -1 to an offset for q. [ -(currentRow / 2) + currentColumn]
-					// r is simply the currentRow
+					// Note: this assume flat top hex tiles
 
-					int q = -(currentRow / 2) + currentColumn - xOffset;
-					int r = currentRow - yOffset;
-					var cell = new HexGridCell<TCellValue>(new AxialCoord(q, r), null);
+					int q = currentColumn - xOffset;
+					int r = currentRow + (currentColumn / 2) - yOffset;
+					var cell = new HexGridCell<TCellValue>(new AxialCoord(q, -r), null);
+					LogManager.GetCurrentClassLogger().Trace("Next Cell: {0}", cell.AxialCoord);
 					cells.Add(cell.AxialCoord.ToString(), cell);
 				}
 			}

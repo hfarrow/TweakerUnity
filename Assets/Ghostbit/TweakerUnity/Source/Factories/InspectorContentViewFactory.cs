@@ -120,6 +120,7 @@ namespace Ghostbit.Tweaker.UI
 			tweakable.ValueChanged += (oldValue, newValue) =>
 			{
 				stringView.InputText.text = newValue.ToString();
+				stringView.InputText.targetGraphic.color = successColor;
 			};
 
 			stringView.gameObject.SetActive(true);

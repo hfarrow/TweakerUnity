@@ -32,8 +32,8 @@ namespace Ghostbit.Tweaker.UI
 		private TileViewFactory tileViewFactory;
 		private Tree<BaseNode> Tree;
 
-		private const uint GRID_WIDTH = 7;
-		private const uint GRID_HEIGHT = 5;
+		private uint gridWidth;
+		private uint gridHeight;
 
 		private ITweakerLogger logger = LogManager.GetCurrentClassLogger();
 
@@ -53,17 +53,69 @@ namespace Ghostbit.Tweaker.UI
 		public void Start()
 		{
 			Tree = ConsoleController.Tree.Tree;
-			grid = new HexGrid<BaseNode>(GRID_WIDTH, GRID_HEIGHT);
-			orderedControllers = new ITileController[GRID_WIDTH * GRID_HEIGHT];
-			orderedCells = new HexGridCell<BaseNode>[GRID_WIDTH * GRID_HEIGHT];
+			CalculateGridSize();
+			grid = new HexGrid<BaseNode>(gridWidth, gridHeight);
+			orderedControllers = new ITileController[gridWidth * gridHeight];
+			orderedCells = new HexGridCell<BaseNode>[gridWidth * gridHeight];
 
 			uint cellCounter = 0;
-			foreach (var cell in grid.GetSpiralCells(CubeCoord.Origin, 5))
+			foreach (var cell in grid.GetSpiralCells(CubeCoord.Origin, Math.Max(gridWidth, gridHeight)))
 			{
 				orderedCells[cellCounter++] = cell;
 			}
 
 			DisplayNode(Tree.Root);
+		}
+
+		//private void CalculateGridSize()
+		//{
+		//	const uint targetGridSize = 5;
+		//	float targetTileSize;
+		//	if(Screen.height < Screen.width)
+		//	{
+		//		gridHeight = targetGridSize;
+		//		targetTileSize = (float)Screen.height / (float)gridHeight;
+		//		gridWidth = (uint)((float)Screen.width / targetTileSize);
+
+		//	}
+		//	else
+		//	{
+		//		gridWidth = targetGridSize;
+		//		targetTileSize = (float)Screen.width / (float)gridWidth;
+		//		gridHeight = (uint)((float)Screen.height / targetTileSize);
+		//	}
+
+		//	logger.Info("GridSize = {0} x {1}", gridWidth, gridHeight);
+		//}
+
+		private void CalculateGridSize()
+		{
+			const uint targetGridSize = 5;
+			logger.Info("screen = {0} x {1}", Screen.width, Screen.height);
+
+			// landscape
+			if (Screen.height < Screen.width)
+			{
+				gridHeight = targetGridSize;
+				float targetTileHeight = (float)Screen.height / ((float)gridHeight + 1);
+				float targetTileWidth = targetTileHeight / (Mathf.Sqrt(3f) / 2f);
+				float horizontalDistance = targetTileWidth * 0.75f;
+				gridWidth = (uint)((float)Screen.width / horizontalDistance);
+
+				logger.Info("gridHeight={0} targetTileHeight={1} targetTileWidth={2} gridWidth={3}", gridHeight, targetTileHeight, targetTileWidth, gridWidth);
+
+			}
+			// portrait
+			else
+			{
+				gridWidth = targetGridSize;
+				float targetTileWidth = (float)Screen.width / (float)gridWidth;
+				targetTileWidth *= 1.25f;
+				float targetTileHeight = targetTileWidth * (Mathf.Sqrt(3f) / 2f);
+				gridHeight = (uint)((float)Screen.height / targetTileHeight);
+			}
+
+			logger.Info("GridSize = {0} x {1}", gridWidth, gridHeight);
 		}
 
 		public void DisplayNode(BaseNode nodeToDisplay)
@@ -106,7 +158,15 @@ namespace Ghostbit.Tweaker.UI
 			for (uint orderedIndex = 0; orderedIndex < displayList.Count; ++orderedIndex)
 			{
 				BaseNode node = displayList[(int)orderedIndex];
-				SetupTileController(orderedIndex, node);
+
+				if (orderedIndex >= orderedCells.Length)
+				{
+					logger.Warn("The hex grid is not large enough to fit all nodes.");
+				}
+				else
+				{
+					SetupTileController(orderedIndex, node);
+				}
 			}
 		}
 
@@ -180,7 +240,7 @@ namespace Ghostbit.Tweaker.UI
 				return null;
 			}
 
-			return tileViewFactory.MakeView<TileView>(cell, GRID_HEIGHT);
+			return tileViewFactory.MakeView<TileView>(cell, gridWidth, gridHeight);
 		}
 	}
 }
