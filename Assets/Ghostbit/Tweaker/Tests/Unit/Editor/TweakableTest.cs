@@ -30,6 +30,7 @@ namespace Ghostbit.Tweaker.Core.Tests
 			 NamedToggleValue("zero", 0, 0),
 			 NamedToggleValue("eleven", 11, 1),
 			 NamedToggleValue("hundred", 100, 2)]
+			[CustomTweakerAttribute]
 			public static int IntPropertyToggle { get; set; }
 
 			[Tweakable("intPropertyStep"), StepSize(10)]
@@ -418,6 +419,26 @@ namespace Ghostbit.Tweaker.Core.Tests
 			tweakable = manager.GetTweakable(new SearchOptions("intFieldToggle"));
 			Assert.IsNotNull(tweakable);
 			ValidateTweakableToggle(tweakable as BaseTweakable<int>, () => { return TestClass.intFieldToggle; });
+		}
+
+		[Test]
+		public void ScanAndRetrieveCustomTweakerAttribute()
+		{
+			Scanner scanner = new Scanner();
+			ScanOptions options = new ScanOptions();
+			options.Assemblies.ScannableRefs = new Assembly[] { Assembly.GetExecutingAssembly() };
+			options.Types.ScannableRefs = new Type[] { typeof(TestClass) };
+
+			TweakableManager manager = new TweakableManager(scanner);
+			scanner.Scan(options);
+
+			var tweakables = manager.GetTweakables(null);
+			Assert.AreEqual(10, tweakables.Count);
+
+			var tweakable = manager.GetTweakable(new SearchOptions("IntPropertyToggle"));
+			Assert.IsNotNull(tweakable);
+			Assert.AreEqual(1, tweakable.CustomAttributes.Length);
+			Assert.AreEqual(typeof(CustomTweakerAttribute), tweakable.CustomAttributes[0].GetType());
 		}
 
 		[Test]

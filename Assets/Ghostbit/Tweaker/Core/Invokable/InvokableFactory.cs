@@ -15,8 +15,8 @@ namespace Ghostbit.Tweaker.Core
 			uint instanceId = boundInstance != null ? boundInstance.UniqueId : 0;
 			string[] argDescriptions = GetArgDescriptions(methodInfo.GetParameters());
 			string returnDescription = GetReturnDescription(methodInfo);
-			return MakeInvokable(new InvokableInfo(name, instanceId, attribute.Description, argDescriptions, returnDescription),
-				methodInfo, boundInstance != null ? boundInstance.Instance : null);
+			return MakeInvokable(new InvokableInfo(name, instanceId, CustomTweakerAttributes.Get(methodInfo), attribute.Description,
+				argDescriptions, returnDescription), methodInfo, boundInstance != null ? boundInstance.Instance : null);
 		}
 
 		public static IInvokable MakeInvokable(InvokableAttribute attribute, EventInfo eventInfo, IBoundInstance boundInstance)
@@ -27,7 +27,7 @@ namespace Ghostbit.Tweaker.Core
 			MethodInfo invokeMethod = eventInfo.EventHandlerType.GetMethod("Invoke");
 			string[] argDescriptions = GetArgDescriptions(invokeMethod.GetParameters());
 			string returnDescription = GetReturnDescription(invokeMethod);
-			return MakeInvokable(new InvokableInfo(name, instanceId, attribute.Description, argDescriptions, returnDescription),
+			return MakeInvokable(new InvokableInfo(name, instanceId, CustomTweakerAttributes.Get(eventInfo), attribute.Description, argDescriptions, returnDescription),
 				eventInfo, instance);
 		}
 

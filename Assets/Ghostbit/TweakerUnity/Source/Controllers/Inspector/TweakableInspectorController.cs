@@ -62,7 +62,7 @@ namespace Ghostbit.Tweaker.UI
 			else if (tweakable.TweakableType.IsNumericType())
 			{
 				yield return contentFactory.MakeEditNumericView(tweakable);
-				if (tweakable.HasRange)
+				if (tweakable.HasRange && tweakable.GetCustomAttribute<HideRangeSliderAttribute>() == null)
 				{
 					yield return contentFactory.MakeSliderView(tweakable);
 				}

@@ -27,11 +27,23 @@ namespace Ghostbit.Tweaker.Core
 		/// </summary>
 		public uint InstanceId { get; private set; }
 
-		public TweakerObjectInfo(string name, uint instanceId = 0, string description = "")
+		/// <summary>
+		/// Custom attributes that this tweaker object was annotated with. Attribute types must
+		/// extend ICustomTweakerAttribute.
+		/// </summary>
+		public ICustomTweakerAttribute[] CustomAttributes { get; set; }
+
+		public TweakerObjectInfo(string name, uint instanceId = 0, ICustomTweakerAttribute[] customAttributes = null, string description = "")
 		{
 			Name = name;
 			Description = description;
 			InstanceId = instanceId;
+
+			if(customAttributes == null)
+			{
+				customAttributes = new ICustomTweakerAttribute[0];
+			}
+			CustomAttributes = customAttributes;
 		}
 	}
 
@@ -129,6 +141,8 @@ namespace Ghostbit.Tweaker.Core
 			}
 		}
 
+		public ICustomTweakerAttribute[] CustomAttributes { get { return Info.CustomAttributes; } }
+
 		public TweakerObject(TweakerObjectInfo info, Assembly assembly, WeakReference instance, bool isPublic)
 		{
 			Info = info;
@@ -150,6 +164,20 @@ namespace Ghostbit.Tweaker.Core
 		protected virtual bool CheckInstanceIsValid()
 		{
 			return IsValid;
+		}
+
+
+		public ICustomTweakerAttribute GetCustomAttribute<TAttribute>()
+		{
+			for(int i = 0; i < CustomAttributes.Length; ++i)
+			{
+				ICustomTweakerAttribute attribute = CustomAttributes[0];
+				if(typeof(TAttribute) == attribute.GetType())
+				{
+					return attribute;
+				}
+			}
+			return null;
 		}
 	}
 }

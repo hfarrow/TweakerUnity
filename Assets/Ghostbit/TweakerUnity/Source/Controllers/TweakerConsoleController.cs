@@ -63,12 +63,17 @@ namespace Ghostbit.Tweaker.UI
 		public void Init(Tweaker tweaker)
 		{
 			logger.Info("Init: " + tweaker);
-			this.Tweaker = tweaker;
+			Tweaker = tweaker;
+			Tweaker.Scanner.ScanInstance(GridController);
+		}
 
+		public void Refresh()
+		{
 			Tree = new TweakerTree(this.Tweaker);
 			Tree.BuildTree();
 
 			isLandscape = IsLandscape();
+			GridController.Refresh();
 		}
 
 		public void ShowInspector(BaseNode nodeToInspect)

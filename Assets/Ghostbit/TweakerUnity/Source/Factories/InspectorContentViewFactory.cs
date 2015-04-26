@@ -230,19 +230,19 @@ namespace Ghostbit.Tweaker.UI
 				sliderView.Slider.wholeNumbers = false;
 			}
 
-			sliderView.Slider.minValue = (float)tweakable.MinValue;
-			sliderView.Slider.maxValue = (float)tweakable.MaxValue;
-			sliderView.Slider.value = (float)tweakable.GetValue();
+			sliderView.Slider.minValue = (float)Convert.ChangeType(tweakable.MinValue, typeof(float));
+			sliderView.Slider.maxValue = (float)Convert.ChangeType(tweakable.MaxValue, typeof(float));
+			sliderView.Slider.value = (float)Convert.ChangeType(tweakable.GetValue(), typeof(float));
 
 			sliderView.ValueChanged += (newValue) =>
 			{
-				tweakable.SetValue(newValue);
+				tweakable.SetValue(Convert.ChangeType(newValue, tweakable.TweakableType));
 			};
 
-			tweakable.ValueChanged += (oldValue, newValue) =>
-			{
-				sliderView.Slider.value = (float)newValue;
-			};
+			//tweakable.ValueChanged += (oldValue, newValue) =>
+			//{
+			//	sliderView.Slider.value = (float)Convert.ChangeType(newValue, typeof(float));
+			//};
 
 			return sliderView;
 		}

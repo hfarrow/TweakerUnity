@@ -29,6 +29,7 @@ namespace Ghostbit.Tweaker.Core
 			var rangeAttribute = memberInfoWithAttributes.GetCustomAttributes(typeof(RangeAttribute), false).ElementAtOrDefault(0) as RangeAttribute;
 			var stepSizeAttribute = memberInfoWithAttributes.GetCustomAttributes(typeof(StepSizeAttribute), false).ElementAtOrDefault(0) as StepSizeAttribute;
 			var toggleValueAttributes = memberInfoWithAttributes.GetCustomAttributes(typeof(NamedToggleValueAttribute), false) as NamedToggleValueAttribute[];
+			var customAttributes = memberInfoWithAttributes.GetCustomAttributes(typeof(ICustomTweakerAttribute), true) as ICustomTweakerAttribute[];
 			toggleValueAttributes = toggleValueAttributes.OrderBy(toggle => toggle.Order).ToArray();
 
 			object range = null;
@@ -94,7 +95,7 @@ namespace Ghostbit.Tweaker.Core
 			}
 
 			string name = GetFinalName(attribute.Name, instance);
-			object info = Activator.CreateInstance(infoType, new object[] { name, range, stepSize, toggleValues, instanceId, attribute.Description });
+			object info = Activator.CreateInstance(infoType, new object[] { name, range, stepSize, toggleValues, instanceId, customAttributes, attribute.Description });
 			Type tweakableType = typeof(BaseTweakable<>).MakeGenericType(new Type[] { type });
 			return Activator.CreateInstance(tweakableType, new object[] { info, memberInfo, weakRef }) as ITweakable;
 		}
@@ -145,7 +146,7 @@ namespace Ghostbit.Tweaker.Core
 
 		/// <summary>
 		/// This will create a virtual field bound to a tweakable.
-		/// TODO: allow range, step, and toggles to be passed in.
+		/// TODO: allow range, step, toggles, and CustomAttributes to be passed in.
 		/// </summary>
 		/// <param name="tweakableType"></param>
 		/// <param name="name"></param>
@@ -160,7 +161,7 @@ namespace Ghostbit.Tweaker.Core
 			Type infoType = typeof(TweakableInfo<>).MakeGenericType(tweakableType);
 			Type fieldType = typeof(VirtualField<>).MakeGenericType(tweakableType);
 			Type baseTweakableType = typeof(BaseTweakable<>).MakeGenericType(tweakableType);
-			object info = Activator.CreateInstance(infoType, name, description);
+			object info = Activator.CreateInstance(infoType, name, new ICustomTweakerAttribute[0], description);
 			object field = Activator.CreateInstance(fieldType);
 			ITweakable tweakable = Activator.CreateInstance(
 				baseTweakableType,

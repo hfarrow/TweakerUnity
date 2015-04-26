@@ -286,11 +286,11 @@ namespace Ghostbit.Tweaker.Core
 				throw new TweakableSetException(Name, "TweakableRange<" + typeof(T).FullName + "> does not implement IComparable");
 			}
 
-			if (comparable.CompareTo(TweakableInfo.Range.MinValue) < 0)
+			if (TweakableInfo.Range.MinValue != null && comparable.CompareTo(TweakableInfo.Range.MinValue) < 0)
 			{
 				return TweakableInfo.Range.MinValue;
 			}
-			else if (comparable.CompareTo(TweakableInfo.Range.MaxValue) > 0)
+			else if (TweakableInfo.Range.MaxValue != null && comparable.CompareTo(TweakableInfo.Range.MaxValue) > 0)
 			{
 				return TweakableInfo.Range.MaxValue;
 			}

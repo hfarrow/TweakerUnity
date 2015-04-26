@@ -42,6 +42,7 @@ namespace Ghostbit.Tweaker.Core.Tests
 			}
 
 			[Invokable("TestMethodStaticVoidVoid")]
+			[CustomTweakerAttribute]
 			public static void TestMethodStaticVoidVoid()
 			{
 				didRunStaticMethod = true;
@@ -243,6 +244,24 @@ namespace Ghostbit.Tweaker.Core.Tests
 
 			invokable = manager.GetInvokable("TestMethodStaticVoidVoid");
 			Assert.IsNotNull(invokable);
+		}
+
+		[Test]
+		public void ScanAndRetrieveCustomTweakerAttribute()
+		{
+			Scanner scanner = new Scanner();
+			ScanOptions options = new ScanOptions();
+			options.Assemblies.ScannableRefs = new Assembly[] { Assembly.GetExecutingAssembly() };
+			options.Types.ScannableRefs = new Type[] { typeof(TestClass) };
+
+			InvokableManager manager = new InvokableManager(scanner);
+			scanner.Scan(options);
+
+			var invokable = manager.GetInvokable(new SearchOptions("TestMethodStaticVoidVoid"));
+			Assert.IsNotNull(invokable);
+
+			Assert.AreEqual(1, invokable.CustomAttributes.Length);
+			Assert.AreEqual(typeof(CustomTweakerAttribute), invokable.CustomAttributes[0].GetType());
 		}
 
 		[Test]

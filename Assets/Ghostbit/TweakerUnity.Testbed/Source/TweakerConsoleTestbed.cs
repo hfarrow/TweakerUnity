@@ -5,6 +5,7 @@ using Ghostbit.Tweaker.Core;
 using CoreLogManager = Ghostbit.Tweaker.Core.LogManager;
 using Ghostbit.Tweaker.AssemblyScanner;
 using System.Reflection;
+using System;
 
 namespace Ghostbit.Tweaker.UI.Testbed
 {
@@ -39,12 +40,13 @@ namespace Ghostbit.Tweaker.UI.Testbed
 			logger.Info("console instatiated: " + console);
 			console.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>(), false);
 			logger.Info("console parented to testbed canvas");
+
 			console.Init(tweaker);
 		}
 
 		void Start()
 		{
-			
+			console.Refresh();
 		}
 	}
 }

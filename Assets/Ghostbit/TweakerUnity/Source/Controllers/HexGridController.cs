@@ -35,6 +35,25 @@ namespace Ghostbit.Tweaker.UI
 
 		private ITweakerLogger logger = LogManager.GetCurrentClassLogger();
 
+		private uint targetGridSize = 5;
+
+		[Tweakable("Tweaker.Grid.TargetGridSize", 
+			Description="The max number of vertical tiles if in landscape or the max number of horizontal tiles if in portrait.")]
+		[Ghostbit.Tweaker.Core.Range(3u, 10u)]
+		[HideRangeSlider]
+		public uint TargetGridSize
+		{
+			get { return targetGridSize; }
+			set
+			{
+				if(targetGridSize != value)
+				{
+					targetGridSize = value;
+					Resize();
+				}
+			}
+		}
+
 		public void Awake()
 		{
 			tilePrefabMap = new Dictionary<Type, TileView>()
@@ -46,9 +65,10 @@ namespace Ghostbit.Tweaker.UI
 			};
 			tileViewFactory = new TileViewFactory(tilePrefabMap,
 				DefaultTileViewPrefab, Instantiate, GridPanel.GetComponent<RectTransform>());
+
 		}
 
-		public void Start()
+		public void Refresh()
 		{
 			Tree = ConsoleController.Tree.Tree;
 			Resize();
@@ -85,8 +105,6 @@ namespace Ghostbit.Tweaker.UI
 
 		private void CalculateGridSize()
 		{
-			const uint targetGridSize = 5;
-
 			if (TweakerConsoleController.IsLandscape())
 			{
 				gridHeight = targetGridSize;
