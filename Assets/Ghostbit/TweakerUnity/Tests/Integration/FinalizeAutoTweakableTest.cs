@@ -44,11 +44,14 @@ namespace Ghostbit.Tweaker.Core.Tests
 			tweaker.Init(null, scanner);
 
 			AutoTweakable.Manager = tweaker.Tweakables;
+
+#pragma warning disable 0219 // is assigned but its value is never used
 			TestClass testClass = new TestClass(false);
+#pragma warning restore 0219
 
 			ITweakable tweakable = null;
 			tweakable = tweaker.Tweakables.GetTweakable(new SearchOptions("TestClass.AutoInt#"));
-			//IntegrationTest.Assert(tweakable != null);
+			IntegrationTest.Assert(tweakable != null);
 			testClass = null;
 
 			uint counter = 0;

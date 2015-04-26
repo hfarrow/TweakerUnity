@@ -94,7 +94,6 @@ namespace Ghostbit.Tweaker.Core.Tests
 		{
 			var name = "TestClass." + methodName;
 			var methodInfo = instance.GetType().GetMethod(methodName);
-			var assembly = methodInfo.GetType().Assembly;
 			var weakRef = instance == null ? null : new WeakReference(instance);
 			return new InvokableMethod(new InvokableInfo(name), methodInfo, weakRef);
 		}
@@ -102,7 +101,6 @@ namespace Ghostbit.Tweaker.Core.Tests
 		private IInvokable CreateInvokableDelegate(string methodName, Delegate del)
 		{
 			var name = "TestClass." + methodName;
-			var assembly = del.Method.GetType().Assembly;
 			return new InvokableMethod(new InvokableInfo(name), del);
 		}
 
@@ -154,7 +152,6 @@ namespace Ghostbit.Tweaker.Core.Tests
 		[Test]
 		public void BindInvokableMethodAndVerifyProperties()
 		{
-			var testClass = new TestClass();
 			var name = "TestClass.VoidVoid";
 			var assembly = typeof(TestClass).Assembly;
 			var methodInfo = typeof(TestClass).GetMethod("TestMethodVoidVoid");
@@ -169,7 +166,6 @@ namespace Ghostbit.Tweaker.Core.Tests
 		[Test]
 		public void BindInvokableDelegateAndVerifyProperties()
 		{
-			var testClass = new TestClass();
 			var name = "TestClass.VoidVoid";
 			var assembly = typeof(TestClass).Assembly;
 			Delegate del = new Action(testClass.TestMethodVoidVoid);
@@ -197,8 +193,6 @@ namespace Ghostbit.Tweaker.Core.Tests
 		[Test]
 		public void BindInvokableEventAndVerifyProperties()
 		{
-			var testClass = new TestClass();
-
 			var name = "TestEventVoidVoid";
 			var assembly = testClass.GetType().Assembly;
 			var eventInfo = testClass.GetType().GetEvent(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
@@ -215,12 +209,10 @@ namespace Ghostbit.Tweaker.Core.Tests
 		[Test]
 		public void BindInvokableEventAndInvoke()
 		{
-			var testClass = new TestClass();
 			bool lambdaDidRun = false;
 			testClass.TestEventVoidVoid += () => { lambdaDidRun = true; };
 
 			var name = "TestEventVoidVoid";
-			var assembly = testClass.GetType().Assembly;
 			var eventInfo = testClass.GetType().GetEvent(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 			var fieldInfo = testClass.GetType().GetField(name, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 			var invokable = new InvokableEvent(new InvokableInfo(name), eventInfo, fieldInfo, new WeakReference(testClass));

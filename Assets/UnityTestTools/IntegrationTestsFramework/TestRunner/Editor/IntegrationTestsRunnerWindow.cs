@@ -14,8 +14,8 @@ namespace UnityTest
         private readonly GUIContent m_GUICreateNewTest = new GUIContent("Create", "Create new test");
         private readonly GUIContent m_GUIRunSelectedTests = new GUIContent("Run Selected", "Run selected test(s)");
         private readonly GUIContent m_GUIRunAllTests = new GUIContent("Run All", "Run all tests");
-        private readonly GUIContent m_GUIAddGoUderTest = new GUIContent("Add GOs under test", "Add new GameObject under selected test");
         private readonly GUIContent m_GUIBlockUI = new GUIContent("Block UI when running", "Block UI when running tests");
+        private readonly GUIContent m_GUIPauseOnFailure = new GUIContent("Pause on test failure");
         #endregion
 
         #region runner steerign vars
@@ -80,6 +80,7 @@ namespace UnityTest
             if (EditorApplication.isPlayingOrWillChangePlaymode) return;
             TestComponent.DestroyAllDynamicTests();
             s_Instance.m_CurrectSceneName = EditorApplication.currentScene;
+			s_Instance.m_ResultList.Clear();
             s_Instance.RebuildTestList();
         }
 
@@ -128,19 +129,6 @@ namespace UnityTest
             // create a test runner if it doesn't exist
             TestRunner.GetTestRunner();
 
-            if (s_Instance.m_Settings.addNewGameObjectUnderSelectedTest
-                && s_Instance.m_SelectedLine != null
-                && Selection.activeGameObject != null)
-            {
-                var go = Selection.activeGameObject;
-                if (go.transform.parent == null
-                    && go.GetComponent<TestComponent>() == null
-                    && go.GetComponent<TestRunner>() == null)
-                {
-                    go.transform.parent = s_Instance.m_SelectedLine.transform;
-                }
-            }
-
             // make tests are not places under a go that is not a test itself
             foreach (var test in TestComponent.FindAllTestsOnScene())
             {
@@ -186,7 +174,8 @@ namespace UnityTest
         private static void SelectInHierarchy(GameObject gameObject)
         {
         	if (!s_Instance) return;
-            if (gameObject == s_Instance.m_SelectedLine) return;
+			if (gameObject == s_Instance.m_SelectedLine && gameObject.activeInHierarchy) return;
+			if (EditorApplication.isPlayingOrWillChangePlaymode) return;
             if (!gameObject.activeSelf)
             {
                 selectedInHierarchy = true;
@@ -218,10 +207,8 @@ namespace UnityTest
 
             m_ReadyToRun = true;
             TestComponent.DisableAllTests();
-            EditorApplication.isPlaying = true;
 
-            if (m_Settings.blockUIWhenRunning)
-                EditorUtility.DisplayProgressBar("Integration Test Runner", "Initializing", 0);
+			EditorApplication.isPlaying = true;
         }
 
         public void Update()
@@ -239,7 +226,8 @@ namespace UnityTest
         private void RebuildTestList()
         {
             m_TestLines = null;
-            if (!TestComponent.AnyTestsOnScene()) return;
+			if (!TestComponent.AnyTestsOnScene() 
+			    && !TestComponent.AnyDynamicTestForCurrentScene()) return;
 
             if (!EditorApplication.isPlayingOrWillChangePlaymode)
             {
@@ -383,8 +371,8 @@ namespace UnityTest
         
         public void AddItemsToMenu(GenericMenu menu)
         {
-            menu.AddItem(m_GUIAddGoUderTest, m_Settings.addNewGameObjectUnderSelectedTest, m_Settings.ToggleAddNewGameObjectUnderSelectedTest);
             menu.AddItem(m_GUIBlockUI, m_Settings.blockUIWhenRunning, m_Settings.ToggleBlockUIWhenRunning);
+            menu.AddItem(m_GUIPauseOnFailure, m_Settings.pauseOnTestFailure, m_Settings.TogglePauseOnTestFailure);
         }
         
         private bool PrintTestList(IntegrationTestRendererBase[] renderedLines)
@@ -437,7 +425,7 @@ namespace UnityTest
 
             if (m_SelectedLine != null)
                 message = GetResultText(m_SelectedLine);
-            EditorGUILayout.TextArea(message, Styles.info);
+            EditorGUILayout.SelectableLabel(message, Styles.info);
             EditorGUILayout.EndScrollView();
         }
 
@@ -521,6 +509,12 @@ namespace UnityTest
                     result.Update(test);
                 else
                     m_Window.m_ResultList.Add(test);
+                    
+                if(test.IsFailure && m_Window.m_Settings.pauseOnTestFailure)
+                {
+                    EditorUtility.ClearProgressBar();
+                    EditorApplication.isPaused = true;
+                }
             }
 
             public void TestRunInterrupted(List<ITestComponent> testsNotRun)
@@ -531,11 +525,19 @@ namespace UnityTest
 
             private void OnEditorUpdate()
             {
-                if (m_Window.m_Settings.blockUIWhenRunning && m_CurrentTest != null
+				if(!EditorApplication.isPlaying) 
+				{
+					TestRunInterrupted(null);
+					return;
+				}
+
+				if (m_Window.m_Settings.blockUIWhenRunning 
+				    && m_CurrentTest != null 
+				    && !EditorApplication.isPaused 
                     && EditorUtility.DisplayCancelableProgressBar("Integration Test Runner",
                                                                   "Running " + m_CurrentTest.Name,
                                                                   (float)m_CurrentTestNumber / m_TestNumber))
-                {
+				{
                     TestRunInterrupted(null);
                 }
             }

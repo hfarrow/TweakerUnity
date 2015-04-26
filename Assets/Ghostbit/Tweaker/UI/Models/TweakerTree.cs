@@ -75,7 +75,7 @@ namespace Ghostbit.Tweaker.UI
 					out virtualFieldRef);
 				argTweakables[i] = tweakable;
 
-				Children.Add(new TweakableNode(tweakable));
+				Children.Add(new TweakableNode(tweakable, virtualFieldRef));
 			}
 		}
 
@@ -95,7 +95,11 @@ namespace Ghostbit.Tweaker.UI
 		public ITweakable Tweakable { get; private set; }
 		public override NodeType Type { get { return NodeType.Tweakable; } }
 
+#pragma warning disable 0414 // is assigned but its value is never used
+		// Keep a reference to the virtual field (if there is one) because the only other reference
+		// to this object is a WeakReference owned by BaseTweakable.
 		private object virtualFieldRef;
+#pragma warning restore 0414
 
 		public TweakableNode(ITweakable tweakable)
 		{

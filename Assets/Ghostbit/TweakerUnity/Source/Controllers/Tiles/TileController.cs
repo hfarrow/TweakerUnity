@@ -103,7 +103,6 @@ namespace Ghostbit.Tweaker.UI
 
 		protected virtual void ViewTapped(TileView view)
 		{
-			logger.Trace("OnTileTapped: {0}", NodeType.ToString());
 		}
 
 		protected virtual void ViewSelected(TileView view)

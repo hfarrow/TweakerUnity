@@ -163,19 +163,9 @@ namespace Ghostbit.Tweaker.Core
 
 		}
 
-		// HACK ALERT:
-		// We must keep a strong ref to virtual fields because it is likely that the
-		// field will be passed in by a user and the user will not keep a reference
-		// causing our WeakReference to become invalid;
-		// TODO: The factory method that creates VirtualFields should return the object
-		// to the user and the user should keep a reference for as long as they want
-		// the tweakable bound to the virtual field.
-		private VirtualField<T> virtualField;
-
 		public BaseTweakable(TweakableInfo<T> info, VirtualField<T> field)
 			: this(info, Assembly.GetCallingAssembly(), new WeakReference(field), false)
 		{
-			virtualField = field;
 			Setter = field.Setter.Method;
 			Getter = field.Getter.Method;
 			ValidateTweakableType();

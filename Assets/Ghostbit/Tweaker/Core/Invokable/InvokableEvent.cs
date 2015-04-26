@@ -8,7 +8,6 @@ namespace Ghostbit.Tweaker.Core
 {
 	public class InvokableEvent : BaseInvokable
 	{
-		private readonly EventInfo eventInfo;
 		private readonly FieldInfo fieldInfo;
 
 		private string methodSignature;
@@ -25,7 +24,6 @@ namespace Ghostbit.Tweaker.Core
 		public InvokableEvent(InvokableInfo info, EventInfo eventInfo, FieldInfo fieldInfo, WeakReference instance)
 			: base(info, fieldInfo.ReflectedType.Assembly, instance, fieldInfo.IsPublic)
 		{
-			this.eventInfo = eventInfo;
 			this.fieldInfo = fieldInfo;
 			methodSignature = "[Unknown]";
 

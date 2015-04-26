@@ -105,12 +105,10 @@ namespace Ghostbit.Tweaker.Core.Tests
 		}
 #pragma warning restore 0067,0649,0659,0661
 
-		private TestClass testClass;
-
 		[SetUp]
 		public void Init()
 		{
-			testClass = new TestClass();
+
 		}
 
 		public const int MIN_VALUE = 0;
