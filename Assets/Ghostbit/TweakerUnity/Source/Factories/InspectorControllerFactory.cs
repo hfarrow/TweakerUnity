@@ -13,6 +13,9 @@ namespace Ghostbit.Tweaker.UI
 			IInspectorController controller = null;
 			switch (type)
 			{
+				case BaseNode.NodeType.Group:
+					controller = new GroupInspectorController(view, grid);
+					break;
 				case BaseNode.NodeType.Invokable:
 					controller = new InvokableInspectorController(view, grid);
 					break;

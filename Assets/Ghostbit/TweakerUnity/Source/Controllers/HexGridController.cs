@@ -9,7 +9,6 @@ namespace Ghostbit.Tweaker.UI
 	{
 		ITweakerConsoleController Console { get; }
 		BaseNode CurrentDisplayNode { get; }
-		BaseNode CurrentInspectorNode { get; }
 
 		void DisplayNode(BaseNode nodeToDisplay);
 	}
@@ -23,7 +22,6 @@ namespace Ghostbit.Tweaker.UI
 
 		public ITweakerConsoleController Console { get { return ConsoleController; } }
 		public BaseNode CurrentDisplayNode { get; private set; }
-		public BaseNode CurrentInspectorNode { get; private set; }
 
 		private HexGrid<BaseNode> grid;
 		private ITileController[] orderedControllers;
@@ -67,31 +65,9 @@ namespace Ghostbit.Tweaker.UI
 			DisplayNode(Tree.Root);
 		}
 
-		//private void CalculateGridSize()
-		//{
-		//	const uint targetGridSize = 5;
-		//	float targetTileSize;
-		//	if(Screen.height < Screen.width)
-		//	{
-		//		gridHeight = targetGridSize;
-		//		targetTileSize = (float)Screen.height / (float)gridHeight;
-		//		gridWidth = (uint)((float)Screen.width / targetTileSize);
-
-		//	}
-		//	else
-		//	{
-		//		gridWidth = targetGridSize;
-		//		targetTileSize = (float)Screen.width / (float)gridWidth;
-		//		gridHeight = (uint)((float)Screen.height / targetTileSize);
-		//	}
-
-		//	logger.Info("GridSize = {0} x {1}", gridWidth, gridHeight);
-		//}
-
 		private void CalculateGridSize()
 		{
 			const uint targetGridSize = 5;
-			logger.Info("screen = {0} x {1}", Screen.width, Screen.height);
 
 			// landscape
 			if (Screen.height < Screen.width)
@@ -99,11 +75,8 @@ namespace Ghostbit.Tweaker.UI
 				gridHeight = targetGridSize;
 				float targetTileHeight = (float)Screen.height / ((float)gridHeight + 1);
 				float targetTileWidth = targetTileHeight / (Mathf.Sqrt(3f) / 2f);
-				float horizontalDistance = targetTileWidth * 0.75f;
-				gridWidth = (uint)((float)Screen.width / horizontalDistance);
-
-				logger.Info("gridHeight={0} targetTileHeight={1} targetTileWidth={2} gridWidth={3}", gridHeight, targetTileHeight, targetTileWidth, gridWidth);
-
+				float horizontalDistance = (targetTileWidth * 0.75f);
+				gridWidth = (uint)((((float)Screen.width - targetTileWidth / 4f)) / horizontalDistance);
 			}
 			// portrait
 			else
@@ -241,6 +214,34 @@ namespace Ghostbit.Tweaker.UI
 			}
 
 			return tileViewFactory.MakeView<TileView>(cell, gridWidth, gridHeight);
+		}
+
+		private void OnGUI()
+		{
+			if(Console.CurrentInspectorNode != null)
+			{
+				return;
+			}
+
+			int yOffset = 10;
+			if(CurrentDisplayNode.Type == BaseNode.NodeType.Group)
+			{
+				var node = CurrentDisplayNode as GroupNode;
+
+				AddLabel(node.FullName, 20, ref yOffset);
+			}
+			else if (CurrentDisplayNode.Type == BaseNode.NodeType.Invokable)
+			{
+				var node = CurrentDisplayNode as InvokableNode;
+				AddLabel(node.Invokable.Name, 20, ref yOffset);
+				AddLabel(node.Invokable.Description, Screen.height - 20, ref yOffset);
+			}
+		}
+
+		private void AddLabel(string label, int height, ref int yOffset)
+		{
+			GUI.Label(new Rect(10, yOffset, Screen.width - 20, height), label);
+			yOffset += height;
 		}
 	}
 }

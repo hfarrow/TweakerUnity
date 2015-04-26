@@ -4,6 +4,10 @@ using System.Collections.Generic;
 
 namespace Ghostbit.Tweaker.UI
 {
+	/// <summary>
+	/// Factory to create hex grids of different shapes and dimensions.
+	/// </summary>
+	/// <remarks>See http://www.redblobgames.com/grids/hexagons for a detailed guide on hexagon grids.</remarks>
 	public static class HexGridFactory
 	{
 		public static Dictionary<string, HexGridCell<TCellValue>> MakeRectangleGrid<TCellValue>(uint width, uint height)
@@ -16,9 +20,7 @@ namespace Ghostbit.Tweaker.UI
 			// Offsets are to make (0,0) the center of the grid because
 			// the grid is generated with (0,0) at the top left.
 			int xOffset = (int)width / 2;
-			//int yOffset = (int)height;
-			//int xOffset = 0;
-			int yOffset = 0;
+			int yOffset = (int)height / 2;
 
 			for (int currentRow = 0; currentRow < height; currentRow++)
 			{
@@ -26,11 +28,14 @@ namespace Ghostbit.Tweaker.UI
 				{
 					// See http://www.redblobgames.com/grids/hexagons/#map-storage for how this logic
 					// was derived.
-					// Note: this assume flat top hex tiles
+					// Note: uses odd-q vertical layout
 
-					int q = currentColumn - xOffset;
-					int r = currentRow + (currentColumn / 2) - yOffset;
-					var cell = new HexGridCell<TCellValue>(new AxialCoord(q, -r), null);
+					int column = currentColumn - xOffset;
+					int row = -1 * (currentRow - yOffset);
+					int x = column;
+					int y = row - (column - (column & 1)) / 2;
+
+					var cell = new HexGridCell<TCellValue>(new AxialCoord(x, y), null);
 					LogManager.GetCurrentClassLogger().Trace("Next Cell: {0}", cell.AxialCoord);
 					cells.Add(cell.AxialCoord.ToString(), cell);
 				}

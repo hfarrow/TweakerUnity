@@ -78,7 +78,6 @@ namespace Ghostbit.Tweaker.UI
 				{
 					// All invokables can be displayed as a group of tweakables.
 					grid.DisplayNode(Node);
-					grid.Console.ShowInspector(Node);
 				}
 			}
 		}

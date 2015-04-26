@@ -90,6 +90,7 @@ namespace Ghostbit.Tweaker.UI
 			View.Tapped += ViewTapped;
 			View.Selected += ViewSelected;
 			View.Deselected += ViewDeselected;
+			View.LongPressed += ViewLongPressed;
 		}
 
 		private void RemoveListeners()
@@ -97,6 +98,7 @@ namespace Ghostbit.Tweaker.UI
 			View.Tapped -= ViewTapped;
 			View.Selected -= ViewSelected;
 			View.Deselected -= ViewDeselected;
+			View.LongPressed -= ViewLongPressed;
 		}
 
 		protected virtual void ViewTapped(TileView view)
@@ -113,6 +115,11 @@ namespace Ghostbit.Tweaker.UI
 		protected virtual void ViewDeselected(TileView view)
 		{
 			View.Scale = deselectedTileScale;
+		}
+
+		protected virtual void ViewLongPressed(TileView obj)
+		{
+			grid.Console.ShowInspector(Node);
 		}
 	}
 }

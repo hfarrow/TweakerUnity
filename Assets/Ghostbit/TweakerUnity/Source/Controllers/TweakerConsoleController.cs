@@ -12,6 +12,7 @@ namespace Ghostbit.Tweaker.UI
 	{
 		Tweaker Tweaker { get; }
 		TweakerTree Tree { get; }
+		BaseNode CurrentInspectorNode { get; }
 		void ShowInspector(BaseNode nodeToInspect);
 		void DestroyObject(GameObject go);
 	}
@@ -23,6 +24,7 @@ namespace Ghostbit.Tweaker.UI
 
 		public Tweaker Tweaker { get; private set; }
 		public TweakerTree Tree { get; private set; }
+		public BaseNode CurrentInspectorNode { get; private set; }
 
 		private IInspectorController inspector;
 		private ITweakerLogger logger = LogManager.GetCurrentClassLogger();
@@ -51,6 +53,7 @@ namespace Ghostbit.Tweaker.UI
 				CreateInspector(nodeToInspect.Type);
 			}
 
+			CurrentInspectorNode = nodeToInspect;
 			inspector.InspectNode(nodeToInspect);
 		}
 
@@ -65,6 +68,7 @@ namespace Ghostbit.Tweaker.UI
 		private void InspectorClosed()
 		{
 			inspector = null;
+			CurrentInspectorNode = null;
 		}
 
 		public void DestroyObject(GameObject go)

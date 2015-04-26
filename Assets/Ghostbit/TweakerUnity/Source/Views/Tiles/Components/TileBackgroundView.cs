@@ -15,6 +15,10 @@ namespace Ghostbit.Tweaker.UI
 		public event Action<TileBackgroundView> Tapped;
 		public event Action<TileBackgroundView> Selected;
 		public event Action<TileBackgroundView> Deselected;
+		public event Action<TileBackgroundView> LongPressed;
+
+		private Coroutine longPressRoutine;
+		private bool didLongPress;
 
 		public Color TileColor
 		{
@@ -50,6 +54,12 @@ namespace Ghostbit.Tweaker.UI
 
 		public void OnSelected()
 		{
+			if(didLongPress)
+			{
+				didLongPress = false;
+				return;
+			}
+
 			if (Selected != null)
 			{
 				Selected(this);
@@ -62,6 +72,30 @@ namespace Ghostbit.Tweaker.UI
 			{
 				Deselected(this);
 			}
+		}
+
+		public void OnPress()
+		{
+			longPressRoutine = StartCoroutine(WaitForLongPress());
+		}
+
+		public void OnRelease()
+		{
+			if (longPressRoutine != null)
+			{
+				StopCoroutine(longPressRoutine);
+			}
+		}
+
+		private IEnumerator WaitForLongPress()
+		{
+			yield return new WaitForSeconds(0.5f);
+			didLongPress = true;
+			if (LongPressed != null)
+			{
+				LongPressed(this);
+			}
+			longPressRoutine = null;
 		}
 	}
 }

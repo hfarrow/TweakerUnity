@@ -61,10 +61,16 @@ namespace Ghostbit.Tweaker.UI
 			if(gridWidth % 2 == 0)
 			{
 				position.y -= yOffset;
+				position.x += (3f / 8f) * tileWidth;
 			}
 			else
 			{
-				position.y += yOffset;
+				position.y -= yOffset;
+			}
+
+			if(gridHeight % 2 == 0)
+			{
+				position.y -= tileHeight / 2;
 			}
 
 			viewTransform.anchoredPosition = position;

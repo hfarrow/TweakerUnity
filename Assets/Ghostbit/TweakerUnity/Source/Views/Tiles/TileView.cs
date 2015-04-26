@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 namespace Ghostbit.Tweaker.UI
 {
@@ -15,6 +16,7 @@ namespace Ghostbit.Tweaker.UI
 		public event Action<TileView> Tapped;
 		public event Action<TileView> Selected;
 		public event Action<TileView> Deselected;
+		public event Action<TileView> LongPressed;
 
 		private Color successColor = Color.green;
 		private Color errorColor = Color.red;
@@ -77,6 +79,7 @@ namespace Ghostbit.Tweaker.UI
 			background.Tapped += OnTapped;
 			background.Selected += OnSelected;
 			background.Deselected += OnDeselected;
+			background.LongPressed += OnLongPressed;
 
 			OnAwake();
 		}
@@ -100,6 +103,7 @@ namespace Ghostbit.Tweaker.UI
 			background.Tapped -= OnTapped;
 			background.Selected -= OnSelected;
 			background.Deselected -= OnDeselected;
+			background.LongPressed -= OnLongPressed;
 
 			OnDestroy();
 			Destroy(gameObject);
@@ -145,6 +149,14 @@ namespace Ghostbit.Tweaker.UI
 			if (Deselected != null)
 			{
 				Deselected(this);
+			}
+		}
+
+		public virtual void OnLongPressed(TileBackgroundView defaultView)
+		{
+			if(LongPressed != null)
+			{
+				LongPressed(this);
 			}
 		}
 
