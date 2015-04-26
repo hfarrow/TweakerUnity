@@ -51,6 +51,24 @@ namespace Ghostbit.Tweaker.UI
 		public void Start()
 		{
 			Tree = ConsoleController.Tree.Tree;
+			Resize();
+		}
+
+		public void Resize()
+		{
+			BaseNode nodeToDisplay = Tree.Root;
+
+			// Cleanup the old grid if it has already been created.
+			if(grid != null)
+			{
+				nodeToDisplay = CurrentDisplayNode;
+				CurrentDisplayNode = null;
+				for(uint i = 0; i < orderedControllers.Length; ++i)
+				{
+					DestroyController(i, true);
+				}
+			}
+
 			CalculateGridSize();
 			grid = new HexGrid<BaseNode>(gridWidth, gridHeight);
 			orderedControllers = new ITileController[gridWidth * gridHeight];
@@ -62,15 +80,14 @@ namespace Ghostbit.Tweaker.UI
 				orderedCells[cellCounter++] = cell;
 			}
 
-			DisplayNode(Tree.Root);
+			DisplayNode(nodeToDisplay);
 		}
 
 		private void CalculateGridSize()
 		{
 			const uint targetGridSize = 5;
 
-			// landscape
-			if (Screen.height < Screen.width)
+			if (TweakerConsoleController.IsLandscape())
 			{
 				gridHeight = targetGridSize;
 				float targetTileHeight = (float)Screen.height / ((float)gridHeight + 1);
@@ -78,7 +95,6 @@ namespace Ghostbit.Tweaker.UI
 				float horizontalDistance = (targetTileWidth * 0.75f);
 				gridWidth = (uint)((((float)Screen.width - targetTileWidth / 4f)) / horizontalDistance);
 			}
-			// portrait
 			else
 			{
 				gridWidth = targetGridSize;
@@ -118,7 +134,7 @@ namespace Ghostbit.Tweaker.UI
 			displayList.AddRange(nodeToDisplay.Children);
 
 			// First let's destroy controllers that will no longer be needed.
-			// (Fewer views than available cells.
+			// (Fewer views than available cells.)
 			for (uint orderedIndex = (uint)displayList.Count; orderedIndex < orderedControllers.Length; ++orderedIndex)
 			{
 				ITileController controller = orderedControllers[orderedIndex];

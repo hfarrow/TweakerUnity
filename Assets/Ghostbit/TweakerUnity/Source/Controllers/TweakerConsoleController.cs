@@ -28,6 +28,36 @@ namespace Ghostbit.Tweaker.UI
 
 		private IInspectorController inspector;
 		private ITweakerLogger logger = LogManager.GetCurrentClassLogger();
+		private bool isLandscape;
+
+		public static bool IsLandscape()
+		{
+			return Screen.height < Screen.width;
+		}
+
+		public static bool IsPortrait()
+		{
+			return !IsLandscape();
+		}
+
+		public void Update()
+		{
+			if (isLandscape != TweakerConsoleController.IsLandscape())
+			{
+				// Orientation changed since last frame.
+				isLandscape = TweakerConsoleController.IsLandscape();
+				
+				if(GridController != null)
+				{
+					GridController.Resize();
+				}
+
+				if(inspector != null)
+				{
+					inspector.Resize();
+				}
+			}
+		}
 
 		// Must be called from awake of another script
 		public void Init(Tweaker tweaker)
@@ -37,6 +67,8 @@ namespace Ghostbit.Tweaker.UI
 
 			Tree = new TweakerTree(this.Tweaker);
 			Tree.BuildTree();
+
+			isLandscape = IsLandscape();
 		}
 
 		public void ShowInspector(BaseNode nodeToInspect)

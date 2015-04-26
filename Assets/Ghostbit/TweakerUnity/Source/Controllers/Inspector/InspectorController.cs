@@ -11,7 +11,8 @@ namespace Ghostbit.Tweaker.UI
 		BaseNode.NodeType NodeType { get; }
 		BaseNode CurrentBaseNode { get; }
 		string Title { get; }
-		void InspectNode(BaseNode node);		
+		void InspectNode(BaseNode node);
+		void Resize();
 	}
 
 	public abstract class InspectorController<TNode> : IInspectorController
@@ -38,6 +39,11 @@ namespace Ghostbit.Tweaker.UI
 			contentFactory = new InspectorContentViewFactory(view);
 			contentViews = new List<IInspectorContentView>();
 			ConfigureViews();
+		}
+
+		public void Resize()
+		{
+			view.Resize();
 		}
 
 		public void InspectNode(BaseNode node)

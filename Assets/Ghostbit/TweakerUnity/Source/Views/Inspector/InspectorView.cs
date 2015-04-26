@@ -29,6 +29,7 @@ namespace Ghostbit.Tweaker.UI
 		public void Awake()
 		{
 			InstatiatePrefabs();
+			Resize();
 			OnAwake();
 		}
 
@@ -69,6 +70,21 @@ namespace Ghostbit.Tweaker.UI
 		{
 			child.GetComponent<RectTransform>().SetParent(parent.GetComponent<RectTransform>(), false);
 			child.GetComponent<RectTransform>().SetAsLastSibling();
+		}
+
+		public void Resize()
+		{
+			var rect = GetComponent<RectTransform>();
+			var anchorMax = rect.anchorMax;
+			if(TweakerConsoleController.IsLandscape())
+			{
+				anchorMax.x = 0.5f;
+			}
+			else
+			{
+				anchorMax.x = 1f;
+			}
+			rect.anchorMax = anchorMax;
 		}
 	}
 }
