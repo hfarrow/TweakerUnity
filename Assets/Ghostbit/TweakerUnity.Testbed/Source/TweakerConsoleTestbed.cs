@@ -34,6 +34,7 @@ namespace Ghostbit.Tweaker.UI.Testbed
 				TweakerOptionFlags.ScanForInvokables |
 				TweakerOptionFlags.ScanForWatchables;
 			tweaker.Init(tweakerOptions, scanner);
+			var serializer = new TweakerSerializer(tweaker.Scanner);
 			tweaker.Scanner.Scan(scanOptions);
 
 			console = Instantiate(ConsolePrefab) as TweakerConsoleController;
@@ -41,7 +42,7 @@ namespace Ghostbit.Tweaker.UI.Testbed
 			console.GetComponent<RectTransform>().SetParent(GetComponent<RectTransform>(), false);
 			logger.Info("console parented to testbed canvas");
 
-			console.Init(tweaker);
+			console.Init(tweaker, serializer);
 		}
 
 		void Start()

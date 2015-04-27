@@ -34,7 +34,7 @@ public class ExampleNodes
 
 	[Tweakable("Example.MyFloat")]
 	[StepSize(1.5f)]
-	[Ghostbit.Tweaker.Core.RangeAttribute(1.0f, 200f)]
+	[TweakerRange(1.0f, 200f)]
 	public static float root_float = 1.0f;
 
 	[Invokable("Example.MyCommand", Description = "This is a test command with args and void return type.")]

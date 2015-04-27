@@ -17,13 +17,19 @@ namespace Ghostbit.Tweaker.UI
 		void Destroy(bool destroyView);
 	}
 
+	public static class TileSettings
+	{
+		[Tweakable("Tweaker.UI.SelectedTileScale", Description = "Display scale of tile when it is selected")]
+		public static Vector3 selectedTileScale = new Vector3(1.6f, 1.6f, 1f);
+
+		[Tweakable("Tweaker.UI.DeselectedTileScale", Description = "Display scale of tile when it is not selected")]
+		public static Vector3 deselectedTileScale = new Vector3(.95f, .95f, 1f);
+	}
+
 	public class TileController<TView, TNode> : ITileController
 		where TView : TileView
 		where TNode : BaseNode
 	{
-		protected static Vector3 selectedTileScale = new Vector3(1.6f, 1.6f, 1f);
-		protected static Vector3 deselectedTileScale = new Vector3(.95f, .95f, 1f);
-
 		public Type ViewType { get { return typeof(TView); } }
 		public BaseNode.NodeType NodeType { get { return Node.Type; } }
 		public TileView BaseView { get { return View; } }
@@ -52,7 +58,7 @@ namespace Ghostbit.Tweaker.UI
 
 		protected virtual void ConfigureView()
 		{
-			View.Scale = deselectedTileScale;
+			View.Scale = TileSettings.deselectedTileScale;
 
 			if(NodeType == UI.BaseNode.NodeType.Unknown)
 			{
@@ -107,13 +113,13 @@ namespace Ghostbit.Tweaker.UI
 
 		protected virtual void ViewSelected(TileView view)
 		{
-			View.Scale = selectedTileScale;
+			View.Scale = TileSettings.selectedTileScale;
 			View.GetComponent<RectTransform>().SetAsLastSibling();
 		}
 
 		protected virtual void ViewDeselected(TileView view)
 		{
-			View.Scale = deselectedTileScale;
+			View.Scale = TileSettings.deselectedTileScale;
 		}
 
 		protected virtual void ViewLongPressed(TileView obj)

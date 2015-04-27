@@ -62,6 +62,43 @@ namespace Ghostbit.Tweaker.UI
 			return stringView;
 		}
 
+		public InspectorStringView MakeEditSerializedStringView(ITweakable tweakable, ITweakerSerializer serializer)
+		{
+			InspectorStringView stringView = inspectorView.InstantiateInspectorComponent(inspectorView.StringEditPrefab);
+			stringView.InputText.targetGraphic.color = successColor;
+
+			object value = tweakable.GetValue();
+			if (value != null)
+			{
+				stringView.InputText.text = serializer.Serialize(value, tweakable.TweakableType);
+			}
+			else
+			{
+				stringView.InputText.text = "";
+			}
+
+			stringView.ValueChanged += (newValue) =>
+			{
+				object obj = serializer.Deserialize(newValue, tweakable.TweakableType);
+				if (obj != null)
+				{
+					tweakable.SetValue(obj);
+				}
+				else
+				{
+					logger.Warn("Failed to deserialize string to type '" + tweakable.TweakableType.FullName + "': " + newValue);
+				}
+			};
+
+			tweakable.ValueChanged += (oldValue, newValue) =>
+			{
+				stringView.InputText.text = serializer.Serialize(newValue, tweakable.TweakableType);
+			};
+
+			stringView.gameObject.SetActive(true);
+			return stringView;
+		}
+
 		public InspectorStringView MakeEditNumericView(ITweakable tweakable)
 		{
 			InspectorStringView stringView = inspectorView.InstantiateInspectorComponent(inspectorView.StringSmallEditPrefab);
@@ -239,10 +276,10 @@ namespace Ghostbit.Tweaker.UI
 				tweakable.SetValue(Convert.ChangeType(newValue, tweakable.TweakableType));
 			};
 
-			//tweakable.ValueChanged += (oldValue, newValue) =>
-			//{
-			//	sliderView.Slider.value = (float)Convert.ChangeType(newValue, typeof(float));
-			//};
+			tweakable.ValueChanged += (oldValue, newValue) =>
+			{
+				sliderView.Slider.value = (float)Convert.ChangeType(newValue, typeof(float));
+			};
 
 			return sliderView;
 		}

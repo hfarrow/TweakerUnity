@@ -62,17 +62,14 @@ namespace Ghostbit.Tweaker.UI
 			else if (tweakable.TweakableType.IsNumericType())
 			{
 				yield return contentFactory.MakeEditNumericView(tweakable);
-				if (tweakable.HasRange && !UIFlagsUtil.IsSet(TweakableFlags.HideRangeSlider, tweakable))
+				if (tweakable.HasRange && !TweakerFlagsUtil.IsSet(TweakableUIFlags.HideRangeSlider, tweakable))
 				{
 					yield return contentFactory.MakeSliderView(tweakable);
 				}
 			}
 			else
 			{
-				yield return null;
-				// TODO: use input text and attempt json deserialization to tweakable.TweakableType
-				// OR
-				// TODO: use reflection to parse object into additional hex grid pages.
+				yield return contentFactory.MakeEditSerializedStringView(tweakable, gridController.Console.Serializer);
 			}
 
 			if(tweakable.HasStep)

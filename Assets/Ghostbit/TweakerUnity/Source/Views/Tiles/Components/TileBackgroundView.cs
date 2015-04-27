@@ -9,6 +9,11 @@ namespace Ghostbit.Tweaker.UI
 {
 	public class TileBackgroundView : MonoBehaviour
 	{
+		[Tweakable("Tweaker.UI.LongPressDelay",
+			Description="How long a tile must be pressed before triggering a long press event.")]
+		[TweakerRange(0.2f, 3f)]
+		public static float LongPressDelay = 0.5f;
+
 		public Image TileImage;
 		public Image HitAreaImage;
 
@@ -84,7 +89,7 @@ namespace Ghostbit.Tweaker.UI
 
 		private IEnumerator WaitForLongPress()
 		{
-			yield return new WaitForSeconds(0.5f);
+			yield return new WaitForSeconds(LongPressDelay);
 			didLongPress = true;
 			if (LongPressed != null)
 			{

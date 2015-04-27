@@ -12,6 +12,7 @@ namespace Ghostbit.Tweaker.UI
 	{
 		Tweaker Tweaker { get; }
 		TweakerTree Tree { get; }
+		ITweakerSerializer Serializer { get; }
 		BaseNode CurrentInspectorNode { get; }
 		void ShowInspector(BaseNode nodeToInspect);
 		void DestroyObject(GameObject go);
@@ -24,6 +25,7 @@ namespace Ghostbit.Tweaker.UI
 
 		public Tweaker Tweaker { get; private set; }
 		public TweakerTree Tree { get; private set; }
+		public ITweakerSerializer Serializer { get; private set; }
 		public BaseNode CurrentInspectorNode { get; private set; }
 
 		private IInspectorController inspector;
@@ -60,10 +62,11 @@ namespace Ghostbit.Tweaker.UI
 		}
 
 		// Must be called from awake of another script
-		public void Init(Tweaker tweaker)
+		public void Init(Tweaker tweaker, ITweakerSerializer serializer)
 		{
 			logger.Info("Init: " + tweaker);
 			Tweaker = tweaker;
+			Serializer = serializer;
 			Tweaker.Scanner.ScanInstance(GridController);
 			Tweaker.Scanner.ScanInstance(this);
 		}

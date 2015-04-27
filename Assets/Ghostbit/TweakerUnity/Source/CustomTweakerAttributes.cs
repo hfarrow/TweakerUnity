@@ -7,7 +7,7 @@ using Ghostbit.Tweaker.Core;
 namespace Ghostbit.Tweaker.UI
 {
 	[Flags]
-	public enum TweakableFlags
+	public enum TweakableUIFlags
 	{
 		None = 0,
 		HideRangeSlider = 1
@@ -15,17 +15,17 @@ namespace Ghostbit.Tweaker.UI
 
 	public class TweakableUIFlagsAttribute : Attribute, ICustomTweakerAttribute
 	{
-		public readonly TweakableFlags Flags;
+		public readonly TweakableUIFlags Flags;
 
-		public TweakableUIFlagsAttribute(TweakableFlags flags)
+		public TweakableUIFlagsAttribute(TweakableUIFlags flags)
 		{
 			Flags = flags;
 		}
 	}
 
-	public static class UIFlagsUtil
+	public static class TweakerFlagsUtil
 	{
-		public static bool IsSet(TweakableFlags flag, ITweakable tweakable)
+		public static bool IsSet(TweakableUIFlags flag, ITweakable tweakable)
 		{
 			var result = false;
 			var attribute = tweakable.GetCustomAttribute<TweakableUIFlagsAttribute>();

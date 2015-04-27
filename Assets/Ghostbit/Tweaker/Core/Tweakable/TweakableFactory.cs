@@ -26,7 +26,7 @@ namespace Ghostbit.Tweaker.Core
 			uint instanceId = instance != null ? instance.UniqueId : 0;
 
 			MemberInfo memberInfoWithAttributes = containerMemberInfo != null ? containerMemberInfo : memberInfo;
-			var rangeAttribute = memberInfoWithAttributes.GetCustomAttributes(typeof(RangeAttribute), false).ElementAtOrDefault(0) as RangeAttribute;
+			var rangeAttribute = memberInfoWithAttributes.GetCustomAttributes(typeof(TweakerRangeAttribute), false).ElementAtOrDefault(0) as TweakerRangeAttribute;
 			var stepSizeAttribute = memberInfoWithAttributes.GetCustomAttributes(typeof(StepSizeAttribute), false).ElementAtOrDefault(0) as StepSizeAttribute;
 			var toggleValueAttributes = memberInfoWithAttributes.GetCustomAttributes(typeof(NamedToggleValueAttribute), false) as NamedToggleValueAttribute[];
 			var customAttributes = memberInfoWithAttributes.GetCustomAttributes(typeof(ICustomTweakerAttribute), true) as ICustomTweakerAttribute[];

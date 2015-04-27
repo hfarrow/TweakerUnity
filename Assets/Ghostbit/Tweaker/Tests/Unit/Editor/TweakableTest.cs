@@ -23,7 +23,7 @@ namespace Ghostbit.Tweaker.Core.Tests
 			[Tweakable("IntProperty")]
 			public static int IntProperty { get; set; }
 
-			[Tweakable("IntPropertyRange"), Core.Range(0, 100)]
+			[Tweakable("IntPropertyRange"), TweakerRange(0, 100)]
 			public static int IntPropertyRange { get; set; }
 
 			[Tweakable("IntPropertyToggle"),
@@ -42,7 +42,7 @@ namespace Ghostbit.Tweaker.Core.Tests
 			[Tweakable("intField")]
 			public static int intField;
 
-			[Tweakable("intFieldRange"), Core.Range(0, 100)]
+			[Tweakable("intFieldRange"), TweakerRange(0, 100)]
 			public static int intFieldRange;
 
 			[Tweakable("intFieldToggle"),
