@@ -65,6 +65,7 @@ namespace Ghostbit.Tweaker.Core
 		/// </summary>
 		/// <typeparam name="TAttribute">The type of attribute to get.</typeparam>
 		/// <returns>The custom attribute or null if there is no attribute of that type.</returns>
-		ICustomTweakerAttribute GetCustomAttribute<TAttribute>();
+		TAttribute GetCustomAttribute<TAttribute>()
+			where TAttribute : Attribute, ICustomTweakerAttribute;
 	}
 }

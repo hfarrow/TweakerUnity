@@ -167,14 +167,15 @@ namespace Ghostbit.Tweaker.Core
 		}
 
 
-		public ICustomTweakerAttribute GetCustomAttribute<TAttribute>()
+		public TAttribute GetCustomAttribute<TAttribute>()
+			where TAttribute : Attribute, ICustomTweakerAttribute
 		{
 			for(int i = 0; i < CustomAttributes.Length; ++i)
 			{
 				ICustomTweakerAttribute attribute = CustomAttributes[0];
 				if(typeof(TAttribute) == attribute.GetType())
 				{
-					return attribute;
+					return attribute as TAttribute;
 				}
 			}
 			return null;

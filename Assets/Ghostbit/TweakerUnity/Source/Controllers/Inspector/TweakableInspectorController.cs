@@ -62,7 +62,7 @@ namespace Ghostbit.Tweaker.UI
 			else if (tweakable.TweakableType.IsNumericType())
 			{
 				yield return contentFactory.MakeEditNumericView(tweakable);
-				if (tweakable.HasRange && tweakable.GetCustomAttribute<HideRangeSliderAttribute>() == null)
+				if (tweakable.HasRange && !UIFlagsUtil.IsSet(TweakableFlags.HideRangeSlider, tweakable))
 				{
 					yield return contentFactory.MakeSliderView(tweakable);
 				}
@@ -79,11 +79,6 @@ namespace Ghostbit.Tweaker.UI
 			{
 				yield return contentFactory.MakeStepperView(tweakable);
 			}
-
-			//if (tweakable.TweakableType.IsEnum)
-			//{
-			//	// TODO: show enum values (same view as toggles);
-			//}
 
 			if(tweakable.HasToggle)
 			{
