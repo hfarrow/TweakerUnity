@@ -46,20 +46,15 @@ namespace Ghostbit.Tweaker.UI
 
 		public void OnTapped()
 		{
-			if (Tapped != null)
+			if (!didLongPress && Tapped != null)
 			{
 				Tapped(this);
 			}
+			didLongPress = false;
 		}
 
 		public void OnSelected()
 		{
-			if(didLongPress)
-			{
-				didLongPress = false;
-				return;
-			}
-
 			if (Selected != null)
 			{
 				Selected(this);

@@ -65,11 +65,13 @@ namespace Ghostbit.Tweaker.UI
 			logger.Info("Init: " + tweaker);
 			Tweaker = tweaker;
 			Tweaker.Scanner.ScanInstance(GridController);
+			Tweaker.Scanner.ScanInstance(this);
 		}
 
+		[Invokable("Tweaker.UI.Refresh", Description="Repopulate the tweaker tree and refresh the hex grid.")]
 		public void Refresh()
 		{
-			Tree = new TweakerTree(this.Tweaker);
+			Tree = new TweakerTree(Tweaker);
 			Tree.BuildTree();
 
 			isLandscape = IsLandscape();

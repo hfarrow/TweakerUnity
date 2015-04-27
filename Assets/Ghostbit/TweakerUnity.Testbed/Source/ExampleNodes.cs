@@ -39,11 +39,11 @@ public class ExampleNodes
 
 	[Invokable("Example.MyCommand", Description = "This is a test command with args and void return type.")]
 	public static void root_command(
-		[ArgDescription("some random integer")] int arg1,
-		[ArgDescription("some random string")] string arg2,
-		[ArgDescription("some random bool")] bool arg3)
+		[ArgDescription("some random integer")] int myInt,
+		[ArgDescription("some random string")] string myString,
+		[ArgDescription("some random bool")] bool myBool)
 	{
-		LogManager.GetCurrentClassLogger().Trace("root_command invoked: {0}, {1}, {2}", arg1, arg2, arg3);
+		LogManager.GetCurrentClassLogger().Trace("root_command invoked: {0}, {1}, {2}", myInt, myString, myBool);
 	}
 
 	[Invokable("Example.MyEvent", Description = "This is a test event with args. There are no listeners.")]

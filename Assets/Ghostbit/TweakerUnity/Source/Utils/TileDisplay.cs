@@ -14,10 +14,12 @@ namespace Ghostbit.Tweaker.UI
 			}
 
 			StringBuilder newName = new StringBuilder(name.Length, name.Length * 2);
+
 			newName.Append(name[0]);
 			for (int i = 1; i < name.Length; ++i)
 			{
-				if(char.IsUpper(name[i]))
+				// Put spaces between words.
+				if(char.IsUpper(name[i]) && !char.IsUpper(name[i-1]))
 				{
 					newName.Append(" ");
 				}

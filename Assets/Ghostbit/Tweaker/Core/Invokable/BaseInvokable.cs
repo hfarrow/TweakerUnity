@@ -11,15 +11,15 @@ namespace Ghostbit.Tweaker.Core
 
 		public abstract string MethodSignature { get; }
 
-		private Type[] argTypes;
-		public Type[] ArgTypes
+		private Type[] parameterTypes;
+		public Type[] ParameterTypes
 		{
 			get
 			{
 				Type[] clone;
-				if (argTypes != null)
+				if (parameterTypes != null)
 				{
-					clone = argTypes.Clone() as Type[];
+					clone = parameterTypes.Clone() as Type[];
 				}
 				else
 				{
@@ -28,6 +28,8 @@ namespace Ghostbit.Tweaker.Core
 				return clone;
 			}
 		}
+
+		public ParameterInfo[] Parameters { get; private set; }
 
 		public BaseInvokable(InvokableInfo info, Assembly assembly, WeakReference instance, bool isPublic, ParameterInfo[] parameters) :
 			this(info, assembly, instance, isPublic)
@@ -43,10 +45,11 @@ namespace Ghostbit.Tweaker.Core
 
 		protected void SetParameters(ParameterInfo[] parameters)
 		{
-			this.argTypes = new Type[parameters.Length];
-			for (var i = 0; i < argTypes.Length; ++i)
+			Parameters = parameters;
+			parameterTypes = new Type[Parameters.Length];
+			for (var i = 0; i < parameterTypes.Length; ++i)
 			{
-				argTypes[i] = parameters[i].ParameterType;
+				parameterTypes[i] = Parameters[i].ParameterType;
 			}
 		}
 
@@ -74,7 +77,7 @@ namespace Ghostbit.Tweaker.Core
 
 		private void CheckArgsAreValid(object[] args)
 		{
-			if (argTypes == null)
+			if (parameterTypes == null)
 			{
 				// SetParameters was never called. Skip validation.
 				return;
@@ -85,9 +88,9 @@ namespace Ghostbit.Tweaker.Core
 				args = new object[0];
 			}
 
-			if (args.Length != argTypes.Length)
+			if (args.Length != parameterTypes.Length)
 			{
-				throw new InvokeArgNumberException(Name, args, argTypes);
+				throw new InvokeArgNumberException(Name, args, parameterTypes);
 			}
 
 			Type[] providedArgTypes = new Type[args.Length];
@@ -101,20 +104,20 @@ namespace Ghostbit.Tweaker.Core
 
 			for (var i = 0; i < args.Length; ++i)
 			{
-				if (args[i] != null && !argTypes[i].IsAssignableFrom(providedArgTypes[i]))
+				if (args[i] != null && !parameterTypes[i].IsAssignableFrom(providedArgTypes[i]))
 				{
-					throw new InvokeArgTypeException(Name, args, providedArgTypes, argTypes,
+					throw new InvokeArgTypeException(Name, args, providedArgTypes, parameterTypes,
 						"Target arg is not assignable from the provided arg.");
 				}
 				else if(args[i] == null)
 				{
-					if (argTypes[i].IsValueType)
+					if (parameterTypes[i].IsValueType)
 					{
-						args[i] = Activator.CreateInstance(argTypes[i]);
+						args[i] = Activator.CreateInstance(parameterTypes[i]);
 						if (args[i] == null)
 						{
-							throw new InvokeArgTypeException(Name, args, providedArgTypes, argTypes,
-								string.Format("Could not construct an instance of value type parameter {0}.", argTypes[i].FullName));
+							throw new InvokeArgTypeException(Name, args, providedArgTypes, parameterTypes,
+								string.Format("Could not construct an instance of value type parameter {0}.", parameterTypes[i].FullName));
 						}
 					}
 				}

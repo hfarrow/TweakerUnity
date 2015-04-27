@@ -62,7 +62,7 @@ namespace Ghostbit.Tweaker.UI
 			// Add an empy invokable node that will execute the invokable.
 			Children.Add(new InvokableNode(null));
 
-			Type[] argTypes = Invokable.ArgTypes;
+			Type[] argTypes = Invokable.ParameterTypes;
 			argTweakables = new ITweakable[argTypes.Length];
 
 			for(int i = 0; i < argTypes.Length; ++i)
@@ -70,7 +70,7 @@ namespace Ghostbit.Tweaker.UI
 				Type argType = argTypes[i];
 				object virtualFieldRef;
 				ITweakable tweakable = TweakableFactory.MakeTweakable(argType, 
-					string.Format("Arg-{0}", i), 
+					Invokable.Parameters[i].Name, 
 					Invokable.InvokableInfo.ArgDescriptions[i],
 					out virtualFieldRef);
 				argTweakables[i] = tweakable;

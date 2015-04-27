@@ -37,7 +37,7 @@ namespace Ghostbit.Tweaker.UI
 
 		private uint targetGridSize = 5;
 
-		[Tweakable("Tweaker.Grid.TargetGridSize", 
+		[Tweakable("Tweaker.UI.TargetGridSize", 
 			Description="The max number of vertical tiles if in landscape or the max number of horizontal tiles if in portrait.")]
 		[Ghostbit.Tweaker.Core.Range(3u, 10u)]
 		[TweakableUIFlags(TweakableFlags.HideRangeSlider)]

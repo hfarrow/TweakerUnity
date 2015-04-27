@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Ghostbit.Tweaker.Core
@@ -21,9 +22,14 @@ namespace Ghostbit.Tweaker.Core
 		string MethodSignature { get; }
 
 		/// <summary>
-		/// Get the type of each argument this invokable requires when invoked.
+		/// Get the type of each parameter this invokable requires when invoked.
 		/// </summary>
-		Type[] ArgTypes { get; }
+		Type[] ParameterTypes { get; }
+
+		/// <summary>
+		/// Get the parameters this invokable requires when invoked.
+		/// </summary>
+		ParameterInfo[] Parameters { get; }
 
 		/// <summary>
 		/// Invoke the invokable object with the provided arguments.
