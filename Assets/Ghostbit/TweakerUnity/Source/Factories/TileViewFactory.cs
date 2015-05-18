@@ -52,7 +52,7 @@ namespace Ghostbit.Tweaker.UI
 			float tileWidth = tileHeight / (Mathf.Sqrt(3f) / 2f);
 			float tileSize = tileWidth / 2f;
 
-			Vector2 position = HexCoord.AxialToPixel(cell.AxialCoord, tileSize);
+			Vector2 position = HexCoord.AxialToPixel(cell.AxialCoord, tileSize).ToVector();
 
 			// Offset the position so that rectangle hex grid looks more centered in the screen.
 			// The direction to offset depends on the grid width because the height of each

@@ -1,9 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Ghostbit.Tweaker.UI
 {
+	public struct PixelCoord
+	{
+		public float x;
+		public float y;
+
+		public PixelCoord(float x, float y)
+		{
+			this.x = x;
+			this.y = y;
+		}
+	}
+
 	public struct CubeCoord
 	{
 		public static CubeCoord[] Directions = 
@@ -184,24 +195,24 @@ namespace Ghostbit.Tweaker.UI
 			//return new CubeCoord(-coord.q - coord.r, coord.q, coord.r);
 		}
 
-		public static Vector2 AxialToPixel(CubeCoord coord, float size)
+		public static PixelCoord AxialToPixel(CubeCoord coord, float size)
 		{
 			AxialCoord axialCoord = CubeToAxial(coord);
 			return AxialToPixel(axialCoord, size);
 		}
 
-		public static Vector2 AxialToPixel(AxialCoord coord, float size)
+		public static PixelCoord AxialToPixel(AxialCoord coord, float size)
 		{
 			// Flat Top
 			float x = size * 3f / 2f * (float)coord.q;
-			float y = size * Mathf.Sqrt(3f) * ((float)coord.r + (float)coord.q / 2f);
+			float y = size * (float)Math.Sqrt(3) * (coord.r + (float)coord.q / 2f);
 
 			// Pointy Top
 			//float x = size * Mathf.Sqrt(3f) * ((float)coord.q + (float)coord.r / 2f);
 			//float y = size * 3f / 2f * (float)coord.r;
 
 			//y *= -1;
-			return new Vector2(x, y);
+			return new PixelCoord(x, y);
 		}
 
 		public static CubeCoord GetNeighbour(CubeCoord coord, uint direction)
