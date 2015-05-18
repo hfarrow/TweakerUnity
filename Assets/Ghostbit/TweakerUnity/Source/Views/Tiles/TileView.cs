@@ -1,11 +1,11 @@
-﻿using Ghostbit.Tweaker.Core;
+﻿using Tweaker.Core;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 
-namespace Ghostbit.Tweaker.UI
+namespace Tweaker.UI
 {
 	public class TileView : MonoBehaviour
 	{

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Ghostbit.Tweaker.Core;
+using Tweaker.Core;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Ghostbit.Tweaker.UI
+namespace Tweaker.UI
 {
 	public class InspectorContentViewFactory
 	{

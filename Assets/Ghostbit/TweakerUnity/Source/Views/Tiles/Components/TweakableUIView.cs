@@ -1,11 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Ghostbit.Tweaker.UI;
-using Ghostbit.Tweaker.Core;
+using Tweaker.UI;
+using Tweaker.Core;
 using UnityEngine.UI;
 using System;
 
-namespace Ghostbit.Tweaker.UI
+namespace Tweaker.UI
 {
 	public class TweakableUIView : TileUIView
 	{

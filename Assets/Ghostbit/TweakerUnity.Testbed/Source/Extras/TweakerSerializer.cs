@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Ghostbit.Tweaker.AssemblyScanner;
+using Tweaker.AssemblyScanner;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace Ghostbit.Tweaker.UI.Testbed
+namespace Tweaker.UI.Testbed
 {
 	public class TweakerSerializer : ITweakerSerializer
 	{

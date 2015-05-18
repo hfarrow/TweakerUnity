@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace Ghostbit.Tweaker.UI
+namespace Tweaker.UI
 {
 	public static class CoordExtensions
 	{

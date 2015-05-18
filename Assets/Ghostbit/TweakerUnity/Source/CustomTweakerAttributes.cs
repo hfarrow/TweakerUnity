@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Ghostbit.Tweaker.Core;
+using Tweaker.Core;
 
-namespace Ghostbit.Tweaker.UI
+namespace Tweaker.UI
 {
 	[Flags]
 	public enum TweakableUIFlags

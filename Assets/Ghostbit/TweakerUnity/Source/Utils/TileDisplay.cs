@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Ghostbit.Tweaker.UI
+namespace Tweaker.UI
 {
 	public static class TileDisplay
 	{

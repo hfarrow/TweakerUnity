@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using Ghostbit.Tweaker.UI;
-using Ghostbit.Tweaker.Core;
+using Tweaker.UI;
+using Tweaker.Core;
 using System.Collections;
 using System;
 using UnityEngine.UI;
 
-namespace Ghostbit.Tweaker.UI
+namespace Tweaker.UI
 {
 	public interface ITweakerConsoleController
 	{

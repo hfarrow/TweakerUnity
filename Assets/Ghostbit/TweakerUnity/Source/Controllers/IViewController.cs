@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Ghostbit.Tweaker.UI
+namespace Tweaker.UI
 {
 	public interface IViewController
 	{

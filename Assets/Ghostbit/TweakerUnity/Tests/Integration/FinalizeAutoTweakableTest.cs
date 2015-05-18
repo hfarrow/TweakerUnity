@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
-using Ghostbit.Tweaker.AssemblyScanner;
+using Tweaker.AssemblyScanner;
 
-namespace Ghostbit.Tweaker.Core.Tests
+namespace Tweaker.Core.Tests
 {
 	public class FinalizeAutoTweakableTest : MonoBehaviour
 	{

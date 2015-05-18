@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Ghostbit.Tweaker.Core;
+using Tweaker.Core;
 using System;
 
 public class ExampleNodes

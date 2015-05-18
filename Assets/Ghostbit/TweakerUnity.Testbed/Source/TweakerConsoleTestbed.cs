@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Ghostbit.Tweaker.Core;
+using Tweaker.Core;
 
-using CoreLogManager = Ghostbit.Tweaker.Core.LogManager;
-using Ghostbit.Tweaker.AssemblyScanner;
+using CoreLogManager = Tweaker.Core.LogManager;
+using Tweaker.AssemblyScanner;
 using System.Reflection;
 using System;
 
-namespace Ghostbit.Tweaker.UI.Testbed
+namespace Tweaker.UI.Testbed
 {
 	public class TweakerConsoleTestbed : MonoBehaviour
 	{

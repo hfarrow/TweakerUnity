@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-using Ghostbit.Tweaker.Core;
+using Tweaker.Core;
 
-namespace Ghostbit.Tweaker.UI.Testbed
+namespace Tweaker.UI.Testbed
 {
 	public class LogManager : ITweakerLogManager
 	{

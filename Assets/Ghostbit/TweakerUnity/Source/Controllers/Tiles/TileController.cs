@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Ghostbit.Tweaker.Core;
+using Tweaker.Core;
 using UnityEngine;
 
-namespace Ghostbit.Tweaker.UI
+namespace Tweaker.UI
 {
 	public interface ITileController : IViewController
 	{

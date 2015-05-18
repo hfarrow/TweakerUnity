@@ -1,11 +1,11 @@
-﻿using Ghostbit.Tweaker.Core;
+﻿using Tweaker.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace Ghostbit.Tweaker.UI
+namespace Tweaker.UI
 {
 	public class InvokableTileController : TileController<TileView, InvokableNode>
 	{
