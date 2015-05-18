@@ -28,7 +28,7 @@ namespace Tweaker.UI
 		private HexGridCell<BaseNode>[] orderedCells;
 		private Dictionary<Type, TileView> tilePrefabMap;
 		private TileViewFactory tileViewFactory;
-		private Tree<BaseNode> Tree;
+		private TreeGraph<BaseNode> Tree;
 
 		private uint gridWidth;
 		private uint gridHeight;
